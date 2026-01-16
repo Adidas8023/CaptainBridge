@@ -1,0 +1,551 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  --font-pixel: var(--font-pixel), "Press Start 2P", monospace;
+  --font-silkscreen: var(--font-silkscreen), "Silkscreen", monospace;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+}
+
+/* ============================================
+   Light Theme - Lime Green
+   ============================================ */
+:root {
+  --radius: 0.625rem;
+  
+  /* Base Colors */
+  --background: #fafaf9;
+  --foreground: #18181b;
+  
+  /* Card & Popover */
+  --card: rgba(255, 255, 255, 0.9);
+  --card-foreground: #18181b;
+  --popover: #ffffff;
+  --popover-foreground: #18181b;
+  
+  /* Primary - Lime */
+  --primary: #84cc16;
+  --primary-foreground: #1a2e05;
+  
+  /* Secondary */
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  
+  /* Muted */
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  
+  /* Accent - Lime variant */
+  --accent: #ecfccb;
+  --accent-foreground: #365314;
+  
+  /* Destructive */
+  --destructive: #ef4444;
+  
+  /* Border & Input */
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #84cc16;
+  
+  /* Charts */
+  --chart-1: #84cc16;
+  --chart-2: #65a30d;
+  --chart-3: #4d7c0f;
+  --chart-4: #3f6212;
+  --chart-5: #365314;
+  
+  /* Sidebar */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #18181b;
+  --sidebar-primary: #84cc16;
+  --sidebar-primary-foreground: #1a2e05;
+  --sidebar-accent: #f4f4f5;
+  --sidebar-accent-foreground: #18181b;
+  --sidebar-border: #e4e4e7;
+  --sidebar-ring: #84cc16;
+  
+  /* Custom CCTP Bridge Colors */
+  --brand-primary: #84cc16;
+  --brand-secondary: #65a30d;
+  --tag-bg: rgba(132, 204, 22, 0.12);
+  --tag-text: #4d7c0f;
+  --switch-active: #84cc16;
+  --success: #22c55e;
+  --warning: #f59e0b;
+}
+
+/* ============================================
+   Dark Theme - Amber/Orange
+   ============================================ */
+.dark {
+  /* Base Colors */
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  
+  /* Card & Popover */
+  --card: rgba(24, 24, 27, 0.9);
+  --card-foreground: #fafafa;
+  --popover: #18181b;
+  --popover-foreground: #fafafa;
+  
+  /* Primary - Amber */
+  --primary: #f59e0b;
+  --primary-foreground: #451a03;
+  
+  /* Secondary */
+  --secondary: #27272a;
+  --secondary-foreground: #fafafa;
+  
+  /* Muted */
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  
+  /* Accent - Amber variant */
+  --accent: #451a03;
+  --accent-foreground: #fef3c7;
+  
+  /* Destructive */
+  --destructive: #f87171;
+  
+  /* Border & Input */
+  --border: #27272a;
+  --input: #27272a;
+  --ring: #f59e0b;
+  
+  /* Charts */
+  --chart-1: #f59e0b;
+  --chart-2: #d97706;
+  --chart-3: #b45309;
+  --chart-4: #92400e;
+  --chart-5: #78350f;
+  
+  /* Sidebar */
+  --sidebar: #18181b;
+  --sidebar-foreground: #fafafa;
+  --sidebar-primary: #f59e0b;
+  --sidebar-primary-foreground: #451a03;
+  --sidebar-accent: #27272a;
+  --sidebar-accent-foreground: #fafafa;
+  --sidebar-border: #27272a;
+  --sidebar-ring: #f59e0b;
+  
+  /* Custom CCTP Bridge Colors */
+  --brand-primary: #f59e0b;
+  --brand-secondary: #d97706;
+  --tag-bg: rgba(245, 158, 11, 0.15);
+  --tag-text: #fbbf24;
+  --switch-active: #f59e0b;
+  --success: #22c55e;
+  --warning: #f59e0b;
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* ============================================
+   Background Gradients
+   ============================================ */
+.bg-gradient-light {
+  background: 
+    linear-gradient(135deg, rgba(132, 204, 22, 0.08) 0%, transparent 50%),
+    linear-gradient(225deg, rgba(101, 163, 13, 0.06) 0%, transparent 50%),
+    linear-gradient(315deg, rgba(77, 124, 15, 0.04) 0%, transparent 50%),
+    #fafaf9;
+}
+
+.bg-gradient-dark {
+  background: 
+    radial-gradient(ellipse at 30% 20%, rgba(245, 158, 11, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(217, 119, 6, 0.1) 0%, transparent 50%),
+    #0a0a0a;
+}
+
+/* ============================================
+   Chevron Decoration
+   ============================================ */
+.chevron-decoration {
+  position: fixed;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+.chevron-left {
+  left: -5%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 25vw;
+  height: 60vh;
+}
+
+.chevron-right {
+  right: -5%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 25vw;
+  height: 60vh;
+}
+
+/* ============================================
+   Card Glassmorphism Effect
+   ============================================ */
+.glass-card {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+.dark .glass-card {
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.3),
+    0 2px 4px -2px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+}
+
+/* ============================================
+   Hover Lift Effect
+   ============================================ */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 12px 24px -8px rgba(0, 0, 0, 0.15),
+    0 4px 8px -4px rgba(0, 0, 0, 0.1);
+}
+
+.dark .hover-lift:hover {
+  box-shadow: 
+    0 12px 24px -8px rgba(0, 0, 0, 0.4),
+    0 4px 8px -4px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   Web3 Gradient Background
+   ============================================ */
+.web3-gradient {
+  background: 
+    radial-gradient(ellipse at 20% 30%, rgba(147, 51, 234, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 70%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 70%);
+}
+
+.dark .web3-gradient {
+  background: 
+    radial-gradient(ellipse at 20% 30%, rgba(147, 51, 234, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 70%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
+}
+
+/* ============================================
+   Info Tag Styles
+   ============================================ */
+.info-tag {
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.info-tag:hover {
+  background: var(--tag-bg);
+  filter: brightness(1.1);
+}
+
+/* ============================================
+   Chain Selector
+   ============================================ */
+.chain-selector {
+  transition: all 0.2s ease;
+}
+
+.chain-selector:hover {
+  background: var(--muted);
+}
+
+/* ============================================
+   Switch Styles
+   ============================================ */
+.switch-track {
+  transition: background-color 0.2s ease;
+}
+
+.switch-track[data-state="checked"] {
+  background-color: var(--switch-active);
+}
+
+/* ============================================
+   Button Hover Effects
+   ============================================ */
+.btn-primary {
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* ============================================
+   Scrollbar Styling
+   ============================================ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--muted-foreground);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--foreground);
+}
+
+/* ============================================
+   Focus Ring Utilities
+   ============================================ */
+.focus-ring {
+  @apply outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+}
+
+/* ============================================
+   Animation Utilities
+   ============================================ */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(var(--brand-primary), 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(var(--brand-primary), 0);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ============================================
+   Blackhole Background Enhancements
+   ============================================ */
+@keyframes float-gentle {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-8px) rotate(2deg);
+  }
+  50% {
+    transform: translateY(0) rotate(0deg);
+  }
+  75% {
+    transform: translateY(8px) rotate(-2deg);
+  }
+}
+
+@keyframes blackhole-pulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.15);
+    opacity: 0.9;
+  }
+}
+
+@keyframes particle-spiral {
+  0% {
+    transform: rotate(0deg) translateX(60px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(360deg) translateX(0px) rotate(-360deg);
+    opacity: 0;
+  }
+}
+
+/* Chain icon floating animation */
+.chain-icon-float {
+  animation: float-gentle 5s ease-in-out infinite;
+}
+
+/* Blackhole glow effect */
+.blackhole-glow {
+  animation: blackhole-pulse 2s ease-in-out infinite;
+}
+
+/* Ensure smooth transitions for theme changes */
+.blackhole-background * {
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ============================================
+   GPU 加速的椭圆轨道动画 - 双层嵌套实现
+   外层: 水平方向 cos 运动
+   内层: 垂直方向 sin 运动
+   组合 = 真正的椭圆轨道
+   ============================================ */
+
+/* 水平方向运动 (cos) */
+@keyframes orbit-x {
+  0%   { transform: translate3d(var(--rx), 0, 0); }
+  25%  { transform: translate3d(0, 0, 0); }
+  50%  { transform: translate3d(calc(var(--rx) * -1), 0, 0); }
+  75%  { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(var(--rx), 0, 0); }
+}
+
+/* 垂直方向运动 (sin) - 相位差 90 度 */
+@keyframes orbit-y {
+  0%   { transform: translate3d(0, 0, 0); }
+  25%  { transform: translate3d(0, var(--ry), 0); }
+  50%  { transform: translate3d(0, 0, 0); }
+  75%  { transform: translate3d(0, calc(var(--ry) * -1), 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+/* 反向运动 */
+@keyframes orbit-x-reverse {
+  0%   { transform: translate3d(var(--rx), 0, 0); }
+  25%  { transform: translate3d(0, 0, 0); }
+  50%  { transform: translate3d(calc(var(--rx) * -1), 0, 0); }
+  75%  { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(var(--rx), 0, 0); }
+}
+
+@keyframes orbit-y-reverse {
+  0%   { transform: translate3d(0, 0, 0); }
+  25%  { transform: translate3d(0, calc(var(--ry) * -1), 0); }
+  50%  { transform: translate3d(0, 0, 0); }
+  75%  { transform: translate3d(0, var(--ry), 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+.planet-orbit-x {
+  animation: orbit-x var(--duration, 20s) linear infinite;
+}
+
+.planet-orbit-x-reverse {
+  animation: orbit-x-reverse var(--duration, 20s) linear infinite;
+}
+
+.planet-orbit-y {
+  animation: orbit-y var(--duration, 20s) linear infinite;
+}
+
+.planet-orbit-y-reverse {
+  animation: orbit-y-reverse var(--duration, 20s) linear infinite;
+}
+
+/* 发光效果 - 静态 */
+.planet-glow {
+  opacity: 0.3;
+}
+
+/* 行星图标悬停效果 - 简化 */
+.planet-icon {
+  transition: transform 0.15s ease-out;
+}
+
+.planet-icon:hover {
+  transform: translate(-50%, -50%) scale(1.2);
+}
+
+/* ============================================
+   CMDK 修复 - 确保列表可滚动
+   ============================================ */
+[cmdk-list] {
+  max-height: 300px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* 确保滚动条可见 */
+[cmdk-list]::-webkit-scrollbar {
+  width: 6px;
+}
+
+[cmdk-list]::-webkit-scrollbar-track {
+  background: var(--muted);
+  border-radius: 3px;
+}
+
+[cmdk-list]::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+[cmdk-list]::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
