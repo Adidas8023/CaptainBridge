@@ -1,6 +1,6 @@
-# OneDollar Bridge
+# CaptainBridge
 
-**OneDollar Bridge** is a modern, high-performance cross-chain bridge application built with **Next.js 16**, **Circle CCTP**, and **Reown AppKit**. It enables seamless asset transfers across supported blockchains, including Ethereum, Solana, and other EVM-compatible chains.
+**CaptainBridge** is a modern, high-performance cross-chain bridge application built with **Next.js 16**, **Circle CCTP**, and **Reown AppKit**. It enables seamless asset transfers across supported blockchains, including Ethereum, Solana, and other EVM-compatible chains.
 
 ## 🚀 Features
 
@@ -30,8 +30,8 @@
 
 1.  Clone the repository:
     ```bash
-    git clone https://github.com/Adidas8023/OneDollar-Bridge.git
-    cd OneDollar-Bridge
+    git clone https://github.com/Adidas8023/CaptainBridge.git
+    cd CaptainBridge
     ```
 
 2.  Install dependencies:
