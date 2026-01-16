@@ -1,6 +1,12 @@
 # CaptainBridge
 
+
 **CaptainBridge** is a modern, high-performance cross-chain bridge application built with **Next.js 16**, **Circle CCTP**, and **Reown AppKit**. It enables seamless asset transfers across supported blockchains, including Ethereum, Solana, and other EVM-compatible chains.
+
+<div align="center">
+  <video src="https://github.com/Adidas8023/CaptainBridge/raw/main/public/bridge.mp4" width="100%" />
+</div>
+
 
 ## 🚀 Features
 
