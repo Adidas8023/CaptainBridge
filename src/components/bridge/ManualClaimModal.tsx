@@ -22,8 +22,9 @@ import { useAppKitAccount } from '@reown/appkit/react';
 import { useHistoryStore } from '@/store/history-store';
 import { useBridge } from '@/lib/hooks/useBridge';
 import { toast } from 'sonner';
-import { IconLoader2, IconCheck, IconX, IconClock } from '@tabler/icons-react';
+import { Check, Clock, Loader2, X } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n';
+import { logger } from '@/lib/logger';
 
 interface ManualClaimModalProps {
   trigger?: React.ReactNode;
@@ -128,7 +129,7 @@ export function ManualClaimModal({ trigger }: ManualClaimModalProps) {
               return;
             }
           } catch (err) {
-            console.error('Failed to check Solana address:', err);
+            logger.warn('Failed to check Solana address:', err);
           }
         }
 
@@ -182,7 +183,7 @@ export function ManualClaimModal({ trigger }: ManualClaimModalProps) {
         setStatus('ready');
       }
     } catch (error) {
-      console.error('Failed to check transaction:', error);
+      logger.warn('Failed to check transaction:', error);
       setStatus('not_found');
     }
   };
@@ -207,7 +208,7 @@ export function ManualClaimModal({ trigger }: ManualClaimModalProps) {
       setStatus('completed');
       toast.success(t.manualClaim.claimSuccess);
     } catch (error) {
-      console.error('Claim failed:', error);
+      logger.warn('Claim failed:', error);
     } finally {
       setIsClaiming(false);
     }
@@ -228,28 +229,28 @@ export function ManualClaimModal({ trigger }: ManualClaimModalProps) {
       case 'loading':
         return (
           <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
-            <IconLoader2 className="w-5 h-5 animate-spin text-primary" />
+            <Loader2 className="w-5 h-5 animate-spin text-primary" />
             <span className="text-sm">{t.manualClaim.checking}</span>
           </div>
         );
       case 'pending':
         return (
           <div className="flex items-center gap-2 p-3 bg-warning/10 border border-warning/20 rounded-lg">
-            <IconClock className="w-5 h-5 text-warning" />
+            <Clock className="w-5 h-5 text-warning" />
             <span className="text-sm text-warning">{t.manualClaim.confirmingTx}</span>
           </div>
         );
       case 'completed':
         return (
           <div className="flex items-center gap-2 p-3 rounded-lg" style={{ backgroundColor: 'rgba(34, 197, 94, 0.15)', border: '1px solid rgba(34, 197, 94, 0.3)' }}>
-            <IconCheck className="w-5 h-5" style={{ color: '#22c55e' }} />
+            <Check className="w-5 h-5" style={{ color: '#22c55e' }} />
             <span className="text-sm font-medium" style={{ color: '#22c55e' }}>{t.manualClaim.alreadyClaimed}</span>
           </div>
         );
       case 'not_found':
         return (
           <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-            <IconX className="w-5 h-5 text-destructive" />
+            <X className="w-5 h-5 text-destructive" />
             <span className="text-sm text-destructive">{t.manualClaim.notFound}</span>
           </div>
         );
@@ -257,7 +258,7 @@ export function ManualClaimModal({ trigger }: ManualClaimModalProps) {
         return (
           <div className="flex flex-col gap-2 p-3 bg-warning/10 border border-warning/20 rounded-lg">
             <div className="flex items-center gap-2">
-              <IconX className="w-5 h-5 text-warning" />
+              <X className="w-5 h-5 text-warning" />
               <span className="text-sm font-medium text-warning">
                 {addressMismatchInfo?.isWalletAddress 
                   ? '地址格式错误' 
@@ -284,7 +285,7 @@ export function ManualClaimModal({ trigger }: ManualClaimModalProps) {
       case 'ready':
         return attestationData && (
           <div className="flex items-center gap-2 p-3 rounded-lg" style={{ backgroundColor: 'rgba(34, 197, 94, 0.15)', border: '1px solid rgba(34, 197, 94, 0.3)' }}>
-            <IconCheck className="w-5 h-5" style={{ color: '#22c55e' }} />
+            <Check className="w-5 h-5" style={{ color: '#22c55e' }} />
             <div className="flex-1">
               <p className="text-sm font-medium" style={{ color: '#22c55e' }}>{t.manualClaim.canClaim}</p>
               <p className="text-xs text-muted-foreground">
@@ -310,7 +311,7 @@ export function ManualClaimModal({ trigger }: ManualClaimModalProps) {
         >
           {isClaiming ? (
             <>
-              <IconLoader2 className="w-5 h-5 mr-2 animate-spin" />
+              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
               {t.manualClaim.claimingAction}
             </>
           ) : (
@@ -340,7 +341,7 @@ export function ManualClaimModal({ trigger }: ManualClaimModalProps) {
       >
         {status === 'loading' ? (
           <>
-            <IconLoader2 className="w-5 h-5 mr-2 animate-spin" />
+            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
             {t.manualClaim.checking}
           </>
         ) : !txHash.trim() ? (
@@ -366,7 +367,15 @@ export function ManualClaimModal({ trigger }: ManualClaimModalProps) {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] glass-card">
+      <DialogContent className="sm:max-w-[425px] glass-card" showCloseButton={false}>
+        <button
+          type="button"
+          aria-label="Close"
+          onClick={() => setOpen(false)}
+          className="ring-offset-background focus:ring-ring absolute top-4 right-4 rounded-lg p-1 opacity-70 transition-all duration-200 hover:opacity-100 hover:bg-muted focus:ring-2 focus:ring-offset-2 focus:outline-hidden"
+        >
+          <X className="size-4" />
+        </button>
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold tracking-tight">{t.manualClaim.title}</DialogTitle>
           <DialogDescription>

@@ -113,6 +113,24 @@ export function formatUserFriendlyError(error: unknown): string | null {
   
   const message = error instanceof Error ? error.message : String(error);
   const lowerMessage = message.toLowerCase();
+
+  // Solana CCTP/Bridge Kit 预检和模拟错误
+  if (message.includes('SOL_FEE_BALANCE_LOW')) {
+    return 'Solana 钱包 SOL 不足：请至少保留约 0.003 SOL 用于手续费/创建 USDC Token Account';
+  }
+
+  if (
+    lowerMessage.includes('instructionerror') ||
+    lowerMessage.includes('custom":1') ||
+    lowerMessage.includes('custom:1') ||
+    lowerMessage.includes('custom program error: 0x1')
+  ) {
+    return 'Solana 交易模拟失败：请确认钱包有足够 USDC，并至少保留少量 SOL 用于手续费/创建 USDC Token Account';
+  }
+
+  if (lowerMessage.includes('simulation failed') && lowerMessage.includes('solana')) {
+    return 'Solana 交易模拟失败：通常是 SOL 不足、USDC 余额不足或 Token Account 未创建';
+  }
   
   // 用户拒绝签名
   if (lowerMessage.includes('user rejected') || 
@@ -163,7 +181,7 @@ export function showTxProgress(message: string, description?: string) {
 /**
  * 显示交易成功提示
  */
-export function showTxSuccess(message: string, description?: string, txHash?: string) {
+export function showTxSuccess(message: string, description?: string) {
   toast.success(message, {
     description,
     duration: 5000,
@@ -189,4 +207,3 @@ export function showWarning(message: string, description?: string) {
     duration: 4000,
   });
 }
-

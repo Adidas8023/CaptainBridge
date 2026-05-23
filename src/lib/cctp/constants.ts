@@ -1,4 +1,5 @@
 import { Chain } from '@/types';
+import { RPC_DEFAULTS } from '@/config/rpc';
 
 // ===========================================
 // RPC URL 配置 - 优先使用环境变量，否则使用公共节点
@@ -10,39 +11,10 @@ const getRpcUrl = (envKey: string, defaultUrl: string): string => {
   return defaultUrl;
 };
 
-// 默认公共 RPC URLs
-const DEFAULT_RPC = {
-  ethereum: 'https://eth.llamarpc.com',
-  avalanche: 'https://api.avax.network/ext/bc/C/rpc',
-  optimism: 'https://mainnet.optimism.io',
-  arbitrum: 'https://arb1.arbitrum.io/rpc',
-  solana: 'https://api.mainnet-beta.solana.com',
-  base: 'https://mainnet.base.org',
-  polygon: 'https://polygon-rpc.com',
-  unichain: 'https://mainnet.unichain.org',
-  linea: 'https://rpc.linea.build',
-  codex: 'https://rpc.codex.xyz',
-  sonic: 'https://rpc.soniclabs.com',
-  worldchain: 'https://worldchain-mainnet.g.alchemy.com/public',
-  monad: 'https://monad-mainnet.drpc.org',
-  sei: 'https://evm-rpc.sei-apis.com',
-  xdc: 'https://erpc.xinfin.network',
-  hyperevm: 'https://rpc.hyperliquid.xyz/evm',
-  ink: 'https://rpc-gel.inkonchain.com',
-  plume: 'https://rpc.plume.org',
-};
+const DEFAULT_RPC = RPC_DEFAULTS;
 
 // CCTP V2 Supported Chains
 export const CHAINS: Chain[] = [
-  // =========================
-  // CCTP V2 主网合约（EVM）
-  // Circle 官方文档：TokenMessengerV2 / MessageTransmitterV2 在多条 EVM 链上地址相同
-  // - TokenMessengerV2(Mainnet): 0x28b5a0e9C621a5BadaA536219b3a228C8168cf5d
-  // - MessageTransmitterV2(Mainnet): 0x81D40F21F12A8F0E3252Bccb954D722d4c464B64
-  //
-  // 你之前遇到的“合约模拟执行失败”，核心原因就是：
-  // 这里填的是 V1 的 TokenMessenger/MessageTransmitter 地址，但你发的是 V2 的 depositForBurn calldata。
-  // =========================
   {
     id: 'ethereum',
     name: 'Ethereum',
@@ -329,6 +301,71 @@ export const CHAINS: Chain[] = [
     fastTransferFee: 2, // 0.02%
     color: '#8B5CF6',
   },
+  {
+    id: 'edge',
+    name: 'Edge',
+    domainId: 28,
+    type: 'evm',
+    chainId: 3343,
+    icon: '/logos/edge.svg',
+    rpcUrl: getRpcUrl('NEXT_PUBLIC_EDGE_RPC_URL', DEFAULT_RPC.edge),
+    explorerUrl: 'https://pro.edgex.exchange/en-US/explorer',
+    usdcAddress: '0x98d2919b9A214E6Fa5384AC81E6864bA686Ad74c',
+    // Edge uses dedicated CCTP v2 contracts.
+    tokenMessengerAddress: '0x98706A006bc632Df31CAdFCBD43F38887ce2ca5c',
+    messageTransmitterAddress: '0x5b61381Fc9e58E70EfC13a4A97516997019198ee',
+    fastTransferFee: 2,
+    supportsFastTransfer: true,
+    color: '#111827',
+  },
+  {
+    id: 'injective',
+    name: 'Injective',
+    domainId: 29,
+    type: 'evm',
+    chainId: 1776,
+    icon: '/logos/injective.svg',
+    rpcUrl: getRpcUrl('NEXT_PUBLIC_INJECTIVE_RPC_URL', DEFAULT_RPC.injective),
+    explorerUrl: 'https://injscan.com',
+    usdcAddress: '0xa00C59fF5a080D2b954d0c75e46E22a0c371235a',
+    tokenMessengerAddress: '0x28b5a0e9C621a5BadaA536219b3a228C8168cf5d',
+    messageTransmitterAddress: '0x81D40F21F12A8F0E3252Bccb954D722d4c464B64',
+    fastTransferFee: 0,
+    supportsFastTransfer: false,
+    color: '#00A3FF',
+  },
+  {
+    id: 'morph',
+    name: 'Morph',
+    domainId: 30,
+    type: 'evm',
+    chainId: 2818,
+    icon: '/logos/morph.svg',
+    rpcUrl: getRpcUrl('NEXT_PUBLIC_MORPH_RPC_URL', DEFAULT_RPC.morph),
+    explorerUrl: 'https://explorer.morph.network',
+    usdcAddress: '0xCfb1186F4e93D60E60a8bDd997427D1F33bc372B',
+    tokenMessengerAddress: '0x28b5a0e9C621a5BadaA536219b3a228C8168cf5d',
+    messageTransmitterAddress: '0x81D40F21F12A8F0E3252Bccb954D722d4c464B64',
+    fastTransferFee: 2,
+    supportsFastTransfer: true,
+    color: '#00D6A3',
+  },
+  {
+    id: 'pharos',
+    name: 'Pharos',
+    domainId: 31,
+    type: 'evm',
+    chainId: 1672,
+    icon: '/logos/pharos.svg',
+    rpcUrl: getRpcUrl('NEXT_PUBLIC_PHAROS_RPC_URL', DEFAULT_RPC.pharos),
+    explorerUrl: 'https://pharos.socialscan.io',
+    usdcAddress: '0xC879C018dB60520F4355C26eD1a6D572cdAC1815',
+    tokenMessengerAddress: '0x28b5a0e9C621a5BadaA536219b3a228C8168cf5d',
+    messageTransmitterAddress: '0x81D40F21F12A8F0E3252Bccb954D722d4c464B64',
+    fastTransferFee: 0,
+    supportsFastTransfer: false,
+    color: '#3B82F6',
+  },
 ];
 
 // Helper functions
@@ -357,4 +394,3 @@ export const FINALITY_THRESHOLD = {
 
 // USDC Decimals
 export const USDC_DECIMALS = 6;
-

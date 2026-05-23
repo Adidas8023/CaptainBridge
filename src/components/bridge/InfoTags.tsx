@@ -3,14 +3,13 @@
 import { useTranslation } from '@/lib/i18n';
 
 interface InfoTagsProps {
-  fee: string;
   eta: string;
   amount?: string;
   feePercent?: number; // basis points, e.g. 1 = 0.01%, 0 = free
   isFastTransfer?: boolean;
 }
 
-export function InfoTags({ fee, eta, amount, feePercent = 1, isFastTransfer = false }: InfoTagsProps) {
+export function InfoTags({ eta, amount, feePercent = 1, isFastTransfer = false }: InfoTagsProps) {
   const { t } = useTranslation();
   // 费率为 0 表示免费
   const isFree = feePercent === 0;

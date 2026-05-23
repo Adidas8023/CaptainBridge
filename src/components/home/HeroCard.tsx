@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Sparkles, Shield, ExternalLink, ShieldCheck, Rocket, MessageCircle } from "lucide-react";
 import Image from "next/image";
 import { useTranslation } from "@/lib/i18n";
+import { CHAINS } from "@/lib/cctp/constants";
 
 interface HeroCardProps {
   onStartTransfer: () => void;
@@ -150,7 +151,7 @@ const HeroCard: React.FC<HeroCardProps> = ({ onStartTransfer }) => {
           viewport={{ once: true }}
         >
           <div className="text-center p-2 rounded-lg bg-primary/10 backdrop-blur-sm border border-primary/20">
-            <div className="text-lg font-bold text-primary drop-shadow-sm">17</div>
+            <div className="text-lg font-bold text-primary drop-shadow-sm">{CHAINS.length}</div>
             <div className="text-xs text-primary/80 font-medium">{language === 'zh' ? '条链' : 'Chains'}</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-chart-2/10 backdrop-blur-sm border border-chart-2/20">

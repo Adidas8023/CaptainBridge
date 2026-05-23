@@ -1,9 +1,10 @@
 'use client';
 
 import { useMemo, useCallback } from 'react';
-import { useAccount, useConnect, useDisconnect as useEvmDisconnect, useSwitchChain } from 'wagmi';
+import { useAccount, useDisconnect as useEvmDisconnect, useSwitchChain } from 'wagmi';
 import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
 import type { Chain } from '@/types';
+import { logger } from '@/lib/logger';
 
 export type WalletType = 'evm' | 'solana' | null;
 
@@ -37,13 +38,11 @@ export function useWallet(): UseWalletReturn {
   // Reown AppKit hooks
   const { open } = useAppKit();
   
-  // ✅ 显式按 namespace 分别获取账户状态
-  const evmAppKitAccount = useAppKitAccount({ namespace: 'eip155' });
+  // ✅ 显式按 namespace 获取 Solana 账户状态
   const solanaAppKitAccount = useAppKitAccount({ namespace: 'solana' });
   
   // Wagmi EVM hooks
   const { address: evmAddress, isConnected: isEvmConnected, chain: evmChain } = useAccount();
-  const { connectAsync, connectors } = useConnect();
   const { disconnect: evmDisconnect } = useEvmDisconnect();
   const { switchChainAsync } = useSwitchChain();
 
@@ -68,27 +67,13 @@ export function useWallet(): UseWalletReturn {
   const connect = useCallback((chainType?: 'evm' | 'solana') => {
     if (chainType === 'solana') {
       // ✅ Solana: 打开 AppKit 弹窗，显式指定 namespace
-      console.log('[Wallet] Opening Solana connect...');
+      logger.info('[Wallet] Opening Solana connect...');
       open({ view: 'Connect', namespace: 'solana' });
       return;
     }
-    // EVM：交给 wagmi connectors
-    void (async () => {
-      try {
-        // ✅ 从已实例化的 connectors 数组中获取
-        const injectedConnector = connectors.find(c => c.id === 'injected') ?? connectors[0];
-        if (injectedConnector) {
-          console.log('[Wallet] Connecting EVM with:', injectedConnector.id);
-          await connectAsync({ connector: injectedConnector });
-          console.log('[Wallet] ✅ EVM connected');
-          return;
-        }
-        console.warn('[Wallet] No injected connector found');
-      } catch (error) {
-        console.error('[Wallet] ❌ EVM connect failed:', error);
-      }
-    })();
-  }, [open, connectAsync, connectors]);
+    logger.info('[Wallet] Opening EVM connect...');
+    open({ view: 'Connect', namespace: 'eip155' });
+  }, [open]);
 
   // 断开 EVM 钱包
   const disconnectEvm = useCallback(() => {
@@ -101,7 +86,9 @@ export function useWallet(): UseWalletReturn {
   const disconnectSolana = useCallback(() => {
     // 尽量直接断开 Solana provider，不影响 EVM
     if (!isSolanaConnected) return;
-    const provider = (window as any).solana;
+    const provider = (window as Window & {
+      solana?: { disconnect?: () => void | Promise<void> };
+    }).solana;
     if (provider?.disconnect) {
       void provider.disconnect();
       return;
@@ -114,15 +101,15 @@ export function useWallet(): UseWalletReturn {
     if (chain.type === 'evm' && chain.chainId) {
       // ✅ 必须先连接才能切换
       if (!isEvmConnected) {
-        console.warn('[Wallet] Cannot switch chain: EVM not connected');
+        logger.warn('[Wallet] Cannot switch chain: EVM not connected');
         return;
       }
       try {
-        console.log('[Wallet] Switching to chain:', chain.chainId);
+        logger.info('[Wallet] Switching to chain:', chain.chainId);
         await switchChainAsync({ chainId: chain.chainId });
-        console.log('[Wallet] ✅ Switched to', chain.name);
+        logger.info('[Wallet] Switched to', chain.name);
       } catch (error) {
-        console.error('[Wallet] ❌ Switch failed:', error);
+        logger.warn('[Wallet] Switch failed:', error);
         throw error;
       }
     }

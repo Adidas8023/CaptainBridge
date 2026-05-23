@@ -3,6 +3,7 @@
 import { useCallback } from 'react';
 import { useAccount } from 'wagmi';
 import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 
 /**
@@ -59,7 +60,7 @@ export function WalletConnector() {
         }`}
         title={isEvmConnected && evmAddress ? evmAddress : 'Connect EVM Wallet'}
       >
-        <img src="/logos/ethereum-eth-logo.png" alt="EVM" className="w-4 h-4 rounded-full" />
+        <Image src="/logos/ethereum-eth-logo.png" alt="EVM" width={16} height={16} className="w-4 h-4 rounded-full" />
         {/* 移动端：已连接显示缩短地址，未连接只显示图标 */}
         {isEvmConnected && evmAddress ? (
           <span className="text-xs font-mono hidden xs:inline sm:inline">
@@ -86,7 +87,7 @@ export function WalletConnector() {
         }`}
         title={isSolanaConnected && solanaAddress ? solanaAddress : 'Connect Solana Wallet'}
       >
-        <img src="/logos/solana.png" alt="Solana" className="w-4 h-4 rounded-full" />
+        <Image src="/logos/solana.png" alt="Solana" width={16} height={16} className="w-4 h-4 rounded-full" />
         {/* 移动端：已连接显示缩短地址，未连接只显示图标 */}
         {isSolanaConnected && solanaAddress ? (
           <span className="text-xs font-mono hidden xs:inline sm:inline">

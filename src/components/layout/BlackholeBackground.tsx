@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState, useMemo, memo } from 'react';
+import { useMemo, memo } from 'react';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
+import { useIsClient } from '@/lib/hooks/useIsClient';
 
 // 链 Logo 数据 - 只展示主要的 12 条链（减少动画数量）
 const chainLogos = [
@@ -212,7 +213,7 @@ CenterGlow.displayName = 'CenterGlow';
 
 export function BlackholeBackground() {
   const { theme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsClient();
   
   // 只计算一次轨道和星星
   const orbits = useMemo(() => createOrbits(), []);
@@ -221,10 +222,6 @@ export function BlackholeBackground() {
   // 主题相关颜色
   const primaryColor = theme === 'dark' ? '#f59e0b' : '#84cc16';
   const glowColor = theme === 'dark' ? 'rgba(245, 158, 11, 0.4)' : 'rgba(132, 204, 22, 0.4)';
-  
-  useEffect(() => {
-    setMounted(true);
-  }, []);
   
   if (!mounted) return null;
   

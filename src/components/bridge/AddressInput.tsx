@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { IconCheck, IconAlertCircle } from '@tabler/icons-react';
+import { Check, CircleAlert } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { isValidEvmAddress, isValidSolanaAddress } from '@/lib/cctp/address-utils';
@@ -25,6 +25,13 @@ export function AddressInput({
 }: AddressInputProps) {
   const { t } = useTranslation();
   const prevChainType = useRef(chainType);
+  const addressRef = useRef(address);
+  const onChangeRef = useRef(onChange);
+
+  useEffect(() => {
+    addressRef.current = address;
+    onChangeRef.current = onChange;
+  }, [address, onChange]);
 
   // 当目标链类型改变时，检查地址格式是否匹配
   useEffect(() => {
@@ -48,8 +55,8 @@ export function AddressInput({
 
   // 初始加载时自动填充
   useEffect(() => {
-    if (connectedAddress && !address) {
-      onChange(connectedAddress);
+    if (connectedAddress && !addressRef.current) {
+      onChangeRef.current(connectedAddress);
     }
   }, [connectedAddress]);
 
@@ -122,11 +129,11 @@ export function AddressInput({
           <div className="absolute right-4">
             {isValid ? (
               <div className="w-6 h-6 rounded-full bg-success flex items-center justify-center">
-                <IconCheck className="w-4 h-4 text-white" />
+                <Check className="w-4 h-4 text-white" />
               </div>
             ) : (
               <div className="w-6 h-6 rounded-full bg-warning/20 flex items-center justify-center">
-                <IconAlertCircle className="w-4 h-4 text-warning" />
+                <CircleAlert className="w-4 h-4 text-warning" />
               </div>
             )}
           </div>
@@ -136,7 +143,7 @@ export function AddressInput({
       {/* Error Message */}
       {errorMessage && (
         <p className="text-xs text-warning flex items-center gap-1">
-          <IconAlertCircle className="w-3 h-3" />
+          <CircleAlert className="w-3 h-3" />
           {errorMessage}
         </p>
       )}

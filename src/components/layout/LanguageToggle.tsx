@@ -1,6 +1,6 @@
 'use client';
 
-import { IconLanguage } from '@tabler/icons-react';
+import { Languages } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/lib/i18n';
 
@@ -19,7 +19,7 @@ export function LanguageToggle() {
       className="relative rounded-full hover:bg-muted/80"
       title={language === 'en' ? '切换到中文' : 'Switch to English'}
     >
-      <IconLanguage className="w-5 h-5" />
+      <Languages className="w-5 h-5" />
       <span className="absolute -bottom-0.5 -right-0.5 text-[10px] font-bold bg-primary text-primary-foreground rounded px-1 leading-tight">
         {language === 'en' ? 'EN' : '中'}
       </span>
@@ -29,4 +29,3 @@ export function LanguageToggle() {
     </Button>
   );
 }
-

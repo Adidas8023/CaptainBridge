@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { IconCheck, IconLoader2, IconCircle } from '@tabler/icons-react';
+import { Check, Circle, Loader2 } from 'lucide-react';
 import type { BridgeStep } from '@/lib/hooks/useBridge';
 import { useTranslation } from '@/lib/i18n';
 
@@ -56,11 +56,11 @@ export function BridgeProgress({ step }: BridgeProgressProps) {
                 }`}
               >
                 {index < currentIndex || (step === 'completed' && index === STEPS.length - 1) ? (
-                  <IconCheck className="w-4 h-4" />
+                  <Check className="w-4 h-4" />
                 ) : index === currentIndex ? (
-                  <IconLoader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  <IconCircle className="w-4 h-4" />
+                  <Circle className="w-4 h-4" />
                 )}
               </div>
               <span

@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useEffect, useRef, useState } from 'react';
+import { ReactNode, useEffect, useRef } from 'react';
 import { createAppKit } from '@reown/appkit/react';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
 import { WagmiProvider } from 'wagmi';
@@ -17,11 +17,15 @@ import {
   solana,
 } from '@reown/appkit/networks';
 import { defineChain } from '@reown/appkit/networks';
-import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
+import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
+import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
 import { ThemeProvider } from 'next-themes';
 import { Toaster } from '@/components/ui/sonner';
 import { solanaConfig } from '@/config/wallet';
+import { getEvmRpcUrls } from '@/config/rpc';
 import { I18nProvider } from '@/lib/i18n';
+import { useIsClient } from '@/lib/hooks/useIsClient';
+import { logger } from '@/lib/logger';
 
 // 保存原始 fetch 函数，防止浏览器扩展（如 Ambire）拦截导致 resource.clone 错误
 const originalFetch = typeof window !== 'undefined' ? window.fetch.bind(window) : undefined;
@@ -50,6 +54,23 @@ const projectId = process.env.NEXT_PUBLIC_REOWN_PROJECT_ID || '';
 // Query client for React Query (单例，模块级)
 const queryClient = new QueryClient();
 
+function withRpcUrls<T extends { id: number; rpcUrls?: unknown }>(network: T): T {
+  return {
+    ...network,
+    rpcUrls: {
+      default: { http: getEvmRpcUrls(network.id) },
+    },
+  };
+}
+
+const ethereum = withRpcUrls(mainnet);
+const arbitrumOne = withRpcUrls(arbitrum);
+const opMainnet = withRpcUrls(optimism);
+const baseMainnet = withRpcUrls(base);
+const polygonPos = withRpcUrls(polygon);
+const avalancheCChain = withRpcUrls(avalanche);
+const lineaMainnet = withRpcUrls(linea);
+
 // 自定义网络配置 - AppKit 预设中没有的网络
 const unichain = defineChain({
   id: 130,
@@ -58,7 +79,7 @@ const unichain = defineChain({
   name: 'Unichain',
   nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
   rpcUrls: {
-    default: { http: ['https://mainnet.unichain.org'] },
+    default: { http: getEvmRpcUrls(130) },
   },
   blockExplorers: {
     default: { name: 'Uniscan', url: 'https://uniscan.xyz' },
@@ -72,7 +93,7 @@ const sonic = defineChain({
   name: 'Sonic',
   nativeCurrency: { name: 'Sonic', symbol: 'S', decimals: 18 },
   rpcUrls: {
-    default: { http: ['https://rpc.soniclabs.com'] },
+    default: { http: getEvmRpcUrls(146) },
   },
   blockExplorers: {
     default: { name: 'Sonicscan', url: 'https://sonicscan.org' },
@@ -86,7 +107,7 @@ const worldchain = defineChain({
   name: 'World Chain',
   nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
   rpcUrls: {
-    default: { http: ['https://worldchain-mainnet.g.alchemy.com/public'] },
+    default: { http: getEvmRpcUrls(480) },
   },
   blockExplorers: {
     default: { name: 'Worldscan', url: 'https://worldscan.org' },
@@ -100,7 +121,7 @@ const sei = defineChain({
   name: 'Sei Network',
   nativeCurrency: { name: 'Sei', symbol: 'SEI', decimals: 18 },
   rpcUrls: {
-    default: { http: ['https://evm-rpc.sei-apis.com'] },
+    default: { http: getEvmRpcUrls(1329) },
   },
   blockExplorers: {
     default: { name: 'Seitrace', url: 'https://seitrace.com' },
@@ -114,7 +135,7 @@ const ink = defineChain({
   name: 'Ink',
   nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
   rpcUrls: {
-    default: { http: ['https://rpc-gel.inkonchain.com'] },
+    default: { http: getEvmRpcUrls(57073) },
   },
   blockExplorers: {
     default: { name: 'Ink Explorer', url: 'https://explorer.inkonchain.com' },
@@ -128,28 +149,133 @@ const monad = defineChain({
   name: 'Monad',
   nativeCurrency: { name: 'Monad', symbol: 'MON', decimals: 18 },
   rpcUrls: {
-    default: { http: ['https://monad-mainnet.drpc.org'] },
+    default: { http: getEvmRpcUrls(143) },
   },
   blockExplorers: {
     default: { name: 'Monad Explorer', url: 'https://monadexplorer.com' },
   },
 });
 
+const xdc = defineChain({
+  id: 50,
+  caipNetworkId: 'eip155:50',
+  chainNamespace: 'eip155',
+  name: 'XDC Network',
+  nativeCurrency: { name: 'XDC', symbol: 'XDC', decimals: 18 },
+  rpcUrls: {
+    default: { http: getEvmRpcUrls(50) },
+  },
+  blockExplorers: {
+    default: { name: 'XDCScan', url: 'https://xdcscan.io' },
+  },
+});
+
+const hyperevm = defineChain({
+  id: 999,
+  caipNetworkId: 'eip155:999',
+  chainNamespace: 'eip155',
+  name: 'HyperEVM',
+  nativeCurrency: { name: 'HYPE', symbol: 'HYPE', decimals: 18 },
+  rpcUrls: {
+    default: { http: getEvmRpcUrls(999) },
+  },
+  blockExplorers: {
+    default: { name: 'HyperEVM Explorer', url: 'https://explorer.hyperliquid.xyz' },
+  },
+});
+
+const plume = defineChain({
+  id: 98866,
+  caipNetworkId: 'eip155:98866',
+  chainNamespace: 'eip155',
+  name: 'Plume',
+  nativeCurrency: { name: 'Plume', symbol: 'PLUME', decimals: 18 },
+  rpcUrls: {
+    default: { http: getEvmRpcUrls(98866) },
+  },
+  blockExplorers: {
+    default: { name: 'Plume Explorer', url: 'https://explorer.plume.org' },
+  },
+});
+
+const edge = defineChain({
+  id: 3343,
+  caipNetworkId: 'eip155:3343',
+  chainNamespace: 'eip155',
+  name: 'Edge',
+  nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+  rpcUrls: {
+    default: { http: getEvmRpcUrls(3343) },
+  },
+  blockExplorers: {
+    default: { name: 'Edge Explorer', url: 'https://pro.edgex.exchange/en-US/explorer' },
+  },
+});
+
+const injective = defineChain({
+  id: 1776,
+  caipNetworkId: 'eip155:1776',
+  chainNamespace: 'eip155',
+  name: 'Injective',
+  nativeCurrency: { name: 'Injective', symbol: 'INJ', decimals: 18 },
+  rpcUrls: {
+    default: { http: getEvmRpcUrls(1776) },
+  },
+  blockExplorers: {
+    default: { name: 'InjScan', url: 'https://injscan.com' },
+  },
+});
+
+const morph = defineChain({
+  id: 2818,
+  caipNetworkId: 'eip155:2818',
+  chainNamespace: 'eip155',
+  name: 'Morph',
+  nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+  rpcUrls: {
+    default: { http: getEvmRpcUrls(2818) },
+  },
+  blockExplorers: {
+    default: { name: 'Morph Explorer', url: 'https://explorer.morph.network' },
+  },
+});
+
+const pharos = defineChain({
+  id: 1672,
+  caipNetworkId: 'eip155:1672',
+  chainNamespace: 'eip155',
+  name: 'Pharos',
+  nativeCurrency: { name: 'Pharos', symbol: 'PHAROS', decimals: 18 },
+  rpcUrls: {
+    default: { http: getEvmRpcUrls(1672) },
+  },
+  blockExplorers: {
+    default: { name: 'Pharos Explorer', url: 'https://pharos.socialscan.io' },
+  },
+});
+
 // 所有 EVM 网络
 const evmNetworks = [
-  mainnet, 
-  arbitrum, 
-  optimism, 
-  base, 
-  polygon, 
-  avalanche, 
-  linea,
+  ethereum,
+  arbitrumOne,
+  opMainnet,
+  baseMainnet,
+  polygonPos,
+  avalancheCChain,
+  lineaMainnet,
   unichain,
   sonic,
   worldchain,
   monad,
   sei,
   ink,
+  xdc,
+  hyperevm,
+  plume,
+  edge,
+  injective,
+  morph,
+  pharos,
 ];
 
 // Wagmi Adapter - EVM链配置
@@ -174,7 +300,7 @@ interface AppProvidersProps {
 }
 
 export function AppProviders({ children }: AppProvidersProps) {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsClient();
   const appKitInitialized = useRef(false);
 
   useEffect(() => {
@@ -201,12 +327,11 @@ export function AppProviders({ children }: AppProvidersProps) {
         themeMode: 'light',
       });
 
-      console.log('[AppKit] Initialized (EVM + Solana)');
+      logger.info('[AppKit] Initialized (EVM + Solana)');
     } catch (error) {
-      console.error('[AppKit] Init failed:', error);
+      logger.warn('[AppKit] Init failed:', error);
     }
 
-    setMounted(true);
   }, []);
 
   return (

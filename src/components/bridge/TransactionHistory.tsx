@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
-import { IconExternalLink, IconClock, IconCheck, IconLoader2, IconRefresh, IconHistory, IconArrowsExchange } from '@tabler/icons-react';
+import { useState, useCallback, useEffect, useRef, useSyncExternalStore } from 'react';
+import { ArrowLeftRight, Check, Clock, ExternalLink, History, Loader2, RefreshCw } from 'lucide-react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useHistoryStore } from '@/store/history-store';
 import { useBridge } from '@/lib/hooks/useBridge';
@@ -11,33 +12,18 @@ import { getAttestation, checkDestinationTransaction } from '@/lib/cctp/iris-api
 import { toast } from 'sonner';
 import type { BridgeTransaction, TransactionStatus } from '@/types';
 import { useTranslation } from '@/lib/i18n';
+import { logger } from '@/lib/logger';
 
 /**
  * Hook to check if store has been hydrated from localStorage
  * Use this to prevent hydration mismatch in SSR
  */
 function useHasHydrated() {
-  const [hasHydrated, setHasHydrated] = useState(
-    // 在客户端初始化时直接检查（避免闪烁）
-    typeof window !== 'undefined' ? useHistoryStore.persist.hasHydrated() : false
+  return useSyncExternalStore(
+    useHistoryStore.persist.onFinishHydration,
+    useHistoryStore.persist.hasHydrated,
+    () => false
   );
-
-  useEffect(() => {
-    // 如果已经 hydrated，直接返回
-    if (useHistoryStore.persist.hasHydrated()) {
-      setHasHydrated(true);
-      return;
-    }
-
-    // 否则监听 hydration 完成事件
-    const unsubscribe = useHistoryStore.persist.onFinishHydration(() => {
-      setHasHydrated(true);
-    });
-
-    return unsubscribe;
-  }, []);
-
-  return hasHydrated;
 }
 
 export function TransactionHistory() {
@@ -144,7 +130,7 @@ export function TransactionHistory() {
             updatedCount++;
           }
         } catch (error) {
-          console.error(`[Refresh] Failed to refresh tx ${tx.id}:`, error);
+          logger.warn(`[Refresh] Failed to refresh tx ${tx.id}:`, error);
         }
         
         // 避免 API 限流
@@ -161,7 +147,14 @@ export function TransactionHistory() {
     } finally {
       setIsRefreshing(false);
     }
-  }, [transactions, updateTransaction]);
+  }, [
+    transactions,
+    updateTransaction,
+    t.history.allUpToDate,
+    t.history.noChanges,
+    t.history.transactions,
+    t.history.updated,
+  ]);
 
   // 页面加载时自动刷新（等待 hydration 完成后，静默执行不显示 toast）
   const hasAutoRefreshedRef = useRef(false);
@@ -176,7 +169,7 @@ export function TransactionHistory() {
   if (!hasHydrated) {
     return (
       <div className="w-full text-center py-12">
-        <IconLoader2 className="w-6 h-6 animate-spin mx-auto text-muted-foreground" />
+        <Loader2 className="w-6 h-6 animate-spin mx-auto text-muted-foreground" />
         <p className="text-sm text-muted-foreground mt-2">{t.history.loadingHistory}</p>
       </div>
     );
@@ -193,11 +186,11 @@ export function TransactionHistory() {
           {/* 主图标容器 */}
           <div className="relative w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-primary/10 to-chart-2/10 rounded-full flex items-center justify-center border border-primary/20">
             {/* 交换箭头 */}
-            <IconArrowsExchange className="w-10 h-10 sm:w-14 sm:h-14 text-primary/40" stroke={1.2} />
+            <ArrowLeftRight className="w-10 h-10 sm:w-14 sm:h-14 text-primary/40" strokeWidth={1.2} />
             
             {/* 小装饰 */}
             <div className="absolute -top-1 -right-1 w-6 h-6 bg-chart-2/20 rounded-full flex items-center justify-center">
-              <IconHistory className="w-3 h-3 text-chart-2" />
+              <History className="w-3 h-3 text-chart-2" />
             </div>
           </div>
         </div>
@@ -240,7 +233,7 @@ export function TransactionHistory() {
           disabled={isRefreshing}
           className="gap-2"
         >
-          <IconRefresh className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
           {isRefreshing ? t.history.refreshing : t.history.refresh}
         </Button>
       </div>
@@ -332,7 +325,7 @@ function TransactionCard({ transaction, onClaim }: TransactionCardProps) {
             className="flex items-center gap-1 text-xs font-mono text-primary hover:underline"
           >
             {formatAddress(transaction.sourceTxHash, 8)}
-            <IconExternalLink className="w-3 h-3" />
+            <ExternalLink className="w-3 h-3" />
           </a>
         </div>
 
@@ -353,7 +346,7 @@ function TransactionCard({ transaction, onClaim }: TransactionCardProps) {
               className="flex items-center gap-1 text-xs font-mono text-primary hover:underline"
             >
               {formatAddress(transaction.destTxHash!, 8)}
-              <IconExternalLink className="w-3 h-3" />
+              <ExternalLink className="w-3 h-3" />
             </a>
           ) : (
             <span className="text-xs text-muted-foreground">
@@ -396,9 +389,12 @@ function ChainIcon({ icon, color, name }: { icon: string; color: string; name: s
 
   return (
     <div className="w-6 h-6 rounded-full overflow-hidden bg-muted flex items-center justify-center shadow-sm">
-      <img
+      <Image
         src={icon}
         alt={name}
+        width={24}
+        height={24}
+        unoptimized
         className="w-full h-full object-cover"
         onError={() => setHasError(true)}
       />
@@ -418,45 +414,45 @@ function getStatusConfig(status: TransactionStatus, t: ReturnType<typeof useTran
       return {
         label: t.history.pending,
         color: 'text-purple-600 dark:text-purple-400',
-        icon: IconLoader2,
+        icon: Loader2,
         spin: true,
       };
     case 'attesting':
       return {
         label: t.history.attesting,
         color: 'text-purple-600 dark:text-purple-400',
-        icon: IconClock,
+        icon: Clock,
       };
     case 'ready':
       return {
         label: t.history.readyToClaim,
         color: 'text-primary',
-        icon: IconCheck,
+        icon: Check,
       };
     case 'claiming':
       return {
         label: t.history.claimingStatus,
         color: 'text-purple-600 dark:text-purple-400',
-        icon: IconLoader2,
+        icon: Loader2,
         spin: true,
       };
     case 'completed':
       return {
         label: t.history.completed,
         color: 'text-success',
-        icon: IconCheck,
+        icon: Check,
       };
     case 'failed':
       return {
         label: t.history.failed,
         color: 'text-destructive',
-        icon: IconClock,
+        icon: Clock,
       };
     default:
       return {
         label: t.history.unknown,
         color: 'text-muted-foreground',
-        icon: IconClock,
+        icon: Clock,
       };
   }
 }

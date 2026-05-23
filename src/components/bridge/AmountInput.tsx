@@ -1,7 +1,8 @@
 'use client';
 
 import { formatUnits } from 'viem';
-import { IconRefresh } from '@tabler/icons-react';
+import { RefreshCw } from 'lucide-react';
+import Image from 'next/image';
 import { useTranslation } from '@/lib/i18n';
 
 interface AmountInputProps {
@@ -75,7 +76,7 @@ export function AmountInput({
                 className="p-0.5 rounded hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
                 title={t.common.refreshBalance || 'Refresh balance'}
               >
-                <IconRefresh className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
               </button>
             )}
           </span>
@@ -107,9 +108,11 @@ export function AmountInput({
         <div className="flex items-center gap-3 shrink-0">
           {/* USDC Icon */}
           <div className="w-10 h-10 rounded-full overflow-hidden shadow-md ring-2 ring-[#2775CA]/20">
-            <img
+            <Image
               src="/logos/usd-coin-usdc-logo.png"
               alt="USDC"
+              width={40}
+              height={40}
               className="w-full h-full object-cover"
             />
           </div>

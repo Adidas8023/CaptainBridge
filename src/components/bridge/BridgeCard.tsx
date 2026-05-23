@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useCallback } from 'react';
-import { IconArrowsExchange, IconLoader2, IconAlertCircle } from '@tabler/icons-react';
+import { useEffect, useMemo, useCallback, useRef } from 'react';
+import { ArrowLeftRight, CircleAlert, Loader2 } from 'lucide-react';
 import { useAppKit } from '@reown/appkit/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -17,9 +17,11 @@ import { useBridge } from '@/lib/hooks/useBridge';
 import { useWallet } from '@/lib/hooks/useWallet';
 import { useUsdcBalance, formatBalance } from '@/lib/hooks/useBalance';
 import { getTransferFee } from '@/lib/cctp/iris-api';
+import { supportsFastTransfer } from '@/lib/cctp/bridge-kit';
 import { toast } from 'sonner';
 import { showTxError } from '@/lib/toast-utils';
 import { useTranslation } from '@/lib/i18n';
+import { logger } from '@/lib/logger';
 
 export function BridgeCard() {
   const { open } = useAppKit();
@@ -28,10 +30,6 @@ export function BridgeCard() {
   // 使用统一钱包 hook
   const { 
     isConnected, 
-    address, 
-    walletType,
-    evmAddress,
-    solanaAddress,
     isEvmConnected,
     isSolanaConnected,
     getAddressForChain,
@@ -45,8 +43,8 @@ export function BridgeCard() {
     amount,
     recipient,
     isFastTransfer,
-    fee,
     feeInBps,
+    standardFeeInBps,
     eta,
     setSourceChain,
     setDestChain,
@@ -57,6 +55,11 @@ export function BridgeCard() {
     setFeeInBps,
     setStandardFeeInBps,
   } = useBridgeStore();
+
+  const recipientRef = useRef(recipient);
+  useEffect(() => {
+    recipientRef.current = recipient;
+  }, [recipient]);
 
   const {
     step,
@@ -69,6 +72,10 @@ export function BridgeCard() {
   // Fetch real USDC balances
   const { balance: sourceBalance, rawBalance: sourceRawBalance, refetch: refetchSourceBalance, isLoading: isSourceBalanceLoading } = useUsdcBalance(sourceChain);
   const { balance: destBalance } = useUsdcBalance(destChain);
+  const sourceSupportsFastTransfer = useMemo(
+    () => supportsFastTransfer(sourceChain),
+    [sourceChain]
+  );
 
   // 获取真实的 API 费率（当源链/目标链变化时）
   const fetchFeeFromApi = useCallback(async () => {
@@ -77,17 +84,17 @@ export function BridgeCard() {
     try {
       const feeResponse = await getTransferFee(sourceChain.domainId, destChain.domainId);
       if (feeResponse) {
-        console.log(`[Fee API] ${sourceChain.name} -> ${destChain.name}: Fast=${feeResponse.feeInBps}bps, Standard=${feeResponse.standardFeeInBps}bps`);
+        logger.info(`[Fee API] ${sourceChain.name} -> ${destChain.name}: Fast=${feeResponse.feeInBps}bps, Standard=${feeResponse.standardFeeInBps}bps`);
         setFeeInBps(feeResponse.feeInBps);
         setStandardFeeInBps(feeResponse.standardFeeInBps ?? 0);
       } else {
         // API 失败，使用本地配置作为回退
-        console.log(`[Fee API] Failed, using local config: ${sourceChain.fastTransferFee}bps`);
+        logger.info(`[Fee API] Failed, using local config: ${sourceChain.fastTransferFee}bps`);
         setFeeInBps(sourceChain.fastTransferFee || 1);
         setStandardFeeInBps(0);
       }
     } catch (error) {
-      console.error('[Fee API] Error:', error);
+      logger.warn('[Fee API] Error:', error);
       setFeeInBps(sourceChain.fastTransferFee || 1);
       setStandardFeeInBps(0);
     }
@@ -97,6 +104,12 @@ export function BridgeCard() {
   useEffect(() => {
     fetchFeeFromApi();
   }, [fetchFeeFromApi]);
+
+  useEffect(() => {
+    if (!sourceSupportsFastTransfer && isFastTransfer) {
+      setIsFastTransfer(false);
+    }
+  }, [sourceSupportsFastTransfer, isFastTransfer, setIsFastTransfer]);
 
   // 检查是否需要连接正确的钱包类型
   const needsWalletConnection = useMemo(() => {
@@ -120,7 +133,7 @@ export function BridgeCard() {
     return evmChainId !== sourceChain.chainId;
   }, [sourceChain, isEvmConnected, evmChainId]);
 
-  // ✅ 检查目标链钱包是否已连接（用于 Solana->EVM 等跨链场景）
+  // BridgeKit 自动领取需要目标链签名钱包；缺失时 CTA 会拉起对应钱包。
   const needsDestWalletConnection = useMemo(() => {
     if (!destChain) return false;
     
@@ -145,10 +158,10 @@ export function BridgeCard() {
       // 如果有对应链类型的钱包地址，自动填充
       if (destAddress) {
         setRecipient(destAddress);
-      } else if (recipient) {
+      } else if (recipientRef.current) {
         // 检查当前地址是否与目标链兼容
-        const isEvmFormat = recipient.startsWith('0x') && recipient.length === 42;
-        const isSolanaFormat = !recipient.startsWith('0x') && recipient.length >= 32 && recipient.length <= 44;
+        const isEvmFormat = recipientRef.current.startsWith('0x') && recipientRef.current.length === 42;
+        const isSolanaFormat = !recipientRef.current.startsWith('0x') && recipientRef.current.length >= 32 && recipientRef.current.length <= 44;
         
         if (destChain.type === 'evm' && !isEvmFormat) {
           setRecipient(''); // 清空不兼容的地址
@@ -161,19 +174,18 @@ export function BridgeCard() {
 
   // Update fee and ETA when fast transfer changes
   useEffect(() => {
-    if (isFastTransfer) {
-      const feePercent = sourceChain?.fastTransferFee || 1;
+    if (isFastTransfer && sourceSupportsFastTransfer) {
       useBridgeStore.setState({
-        fee: feePercent > 0 ? `${(feePercent / 100).toFixed(2)}%` : '0',
+        fee: feeInBps > 0 ? `${(feeInBps / 100).toFixed(2)}%` : 'Free',
         eta: 'a few seconds',
       });
     } else {
       useBridgeStore.setState({
-        fee: '0',
+        fee: standardFeeInBps > 0 ? `${(standardFeeInBps / 100).toFixed(2)}%` : 'Free',
         eta: '15-20 minutes',
       });
     }
-  }, [isFastTransfer, sourceChain]);
+  }, [isFastTransfer, sourceSupportsFastTransfer, feeInBps, standardFeeInBps]);
 
   // Refetch balance after bridge completes
   useEffect(() => {
@@ -185,7 +197,7 @@ export function BridgeCard() {
   const handleConnect = () => {
     // ✅ Solana: 打开 AppKit 弹窗，显式指定 namespace
     if (sourceChain?.type === 'solana') {
-      console.log('[Bridge] Opening Solana connect');
+      logger.info('[Bridge] Opening Solana connect');
       open({ view: 'Connect', namespace: 'solana' });
       return;
     }
@@ -194,17 +206,37 @@ export function BridgeCard() {
     if (sourceChain?.type === 'evm') {
       if (isEvmConnected && sourceChain.chainId) {
         // ✅ 已连接，切换网络
-        console.log('[Bridge] EVM connected, switching to', sourceChain.name);
+        logger.info('[Bridge] EVM connected, switching to', sourceChain.name);
         void switchNetwork(sourceChain);
       } else {
-        // ✅ 未连接，触发 wagmi 连接
-        console.log('[Bridge] EVM not connected, triggering connect');
-        // 不打开 AppKit，让 WalletConnector 处理 EVM 连接
+        logger.info('[Bridge] Opening EVM connect');
+        open({ view: 'Connect', namespace: 'eip155' });
       }
       return;
     }
     
     // 兜底：打开 AppKit
+    open({ view: 'Connect' });
+  };
+
+  const handleDestConnect = () => {
+    if (destChain?.type === 'solana') {
+      logger.info('[Bridge] Opening destination Solana connect');
+      open({ view: 'Connect', namespace: 'solana' });
+      return;
+    }
+
+    if (destChain?.type === 'evm') {
+      if (isEvmConnected && destChain.chainId) {
+        logger.info('[Bridge] Switching destination EVM network to', destChain.name);
+        void switchNetwork(destChain);
+      } else {
+        logger.info('[Bridge] Opening destination EVM connect');
+        open({ view: 'Connect', namespace: 'eip155' });
+      }
+      return;
+    }
+
     open({ view: 'Connect' });
   };
 
@@ -216,7 +248,6 @@ export function BridgeCard() {
 
     // ✅ 检查目标链钱包是否已连接
     if (needsDestWalletConnection) {
-      const chainType = destChain.type === 'evm' ? 'EVM' : 'Solana';
       toast.error(destChain.type === 'evm' ? t.bridge.connectEvmToReceive : t.bridge.connectSolanaToReceive);
       return;
     }
@@ -257,6 +288,12 @@ export function BridgeCard() {
         return t.wallet.connectEvmWallet;
       }
     }
+
+    if (needsDestWalletConnection && destChain) {
+      return destChain.type === 'solana'
+        ? t.wallet.connectSolanaWallet
+        : t.wallet.connectEvmWallet;
+    }
     
     switch (step) {
       case 'checking-allowance':
@@ -282,7 +319,7 @@ export function BridgeCard() {
     if (!isConnected) return false;
     if (needsWalletConnection) return false; // 允许点击切换钱包
     if (needsSwitchSourceNetwork) return false; // ✅ 允许点击切换网络
-    if (needsDestWalletConnection) return true; // 目标链钱包未连接时禁用
+    if (needsDestWalletConnection) return false; // 允许点击连接目标链钱包
     if (isLoading) return true;
     if (!amount || parseFloat(amount) <= 0) return true;
     if (!recipient) return true;
@@ -304,6 +341,8 @@ export function BridgeCard() {
         toast.dismiss('switch-network');
         showTxError(err, t.bridge.switchFailed);
       }
+    } else if (needsDestWalletConnection) {
+      handleDestConnect();
     } else if (step === 'error' || step === 'completed') {
       reset();
       setAmount('');
@@ -343,7 +382,7 @@ export function BridgeCard() {
         {warnings.map((warning, idx) => (
           <div key={idx} className="mb-4 p-3 bg-warning/10 border border-warning/20 rounded-lg">
             <div className="flex items-center gap-2 text-warning">
-              <IconAlertCircle className="w-4 h-4 shrink-0" />
+              <CircleAlert className="w-4 h-4 shrink-0" />
               <span className="text-sm">{warning.message}</span>
             </div>
           </div>
@@ -399,7 +438,7 @@ export function BridgeCard() {
               onClick={swapChains}
               disabled={isLoading}
             >
-              <IconArrowsExchange className="w-4 h-4 text-muted-foreground" />
+              <ArrowLeftRight className="w-4 h-4 text-muted-foreground" />
             </Button>
           </div>
           
@@ -431,7 +470,7 @@ export function BridgeCard() {
             onClick={swapChains}
             disabled={isLoading}
           >
-            <IconArrowsExchange className="w-4 h-4 text-muted-foreground" />
+            <ArrowLeftRight className="w-4 h-4 text-muted-foreground" />
           </Button>
           
           <div className="flex-1">
@@ -471,23 +510,24 @@ export function BridgeCard() {
         </div>
 
         {/* Fast Transfer Toggle */}
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-sm font-medium text-muted-foreground">{t.bridge.fastTransfer}</span>
-          <FastTransferToggle
-            enabled={isFastTransfer}
-            onChange={setIsFastTransfer}
-            visible={!isLoading}
-          />
-        </div>
+        {sourceSupportsFastTransfer && (
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-muted-foreground">{t.bridge.fastTransfer}</span>
+            <FastTransferToggle
+              enabled={isFastTransfer}
+              onChange={setIsFastTransfer}
+              visible={!isLoading}
+            />
+          </div>
+        )}
 
         {/* Info Tags */}
         <div className="mb-6">
           <InfoTags 
-            fee={fee} 
             eta={eta} 
             amount={amount}
             feePercent={feeInBps}
-            isFastTransfer={isFastTransfer}
+            isFastTransfer={isFastTransfer && sourceSupportsFastTransfer}
           />
         </div>
 
@@ -497,7 +537,7 @@ export function BridgeCard() {
           onClick={handleButtonClick}
           disabled={isButtonDisabled()}
         >
-          {isLoading && <IconLoader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />}
+          {isLoading && <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />}
           {getButtonText()}
         </Button>
 

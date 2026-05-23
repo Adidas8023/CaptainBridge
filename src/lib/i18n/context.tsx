@@ -1,7 +1,8 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { translations, Language, TranslationKeys } from './translations';
+import { useIsClient } from '@/lib/hooks/useIsClient';
 
 interface I18nContextType {
   language: Language;
@@ -14,27 +15,24 @@ const I18nContext = createContext<I18nContextType | undefined>(undefined);
 const STORAGE_KEY = 'cctp-language';
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>('en');
-  const [mounted, setMounted] = useState(false);
+  const [language, setLanguageState] = useState<Language>(() => {
+    if (typeof window === 'undefined') return 'en';
 
-  // 从 localStorage 读取语言设置
-  useEffect(() => {
-    setMounted(true);
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored && (stored === 'en' || stored === 'zh')) {
-      setLanguageState(stored);
-    } else {
-      // 检测浏览器语言
-      const browserLang = navigator.language.toLowerCase();
-      if (browserLang.startsWith('zh')) {
-        setLanguageState('zh');
-      }
+      return stored;
     }
-  }, []);
+
+    const browserLang = navigator.language.toLowerCase();
+    return browserLang.startsWith('zh') ? 'zh' : 'en';
+  });
+  const mounted = useIsClient();
 
   const setLanguage = useCallback((lang: Language) => {
     setLanguageState(lang);
-    localStorage.setItem(STORAGE_KEY, lang);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, lang);
+    }
   }, []);
 
   const t = translations[language];
@@ -67,4 +65,3 @@ export function useTranslation() {
   const { t, language, setLanguage } = useI18n();
   return { t, language, setLanguage };
 }
-

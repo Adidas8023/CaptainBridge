@@ -2,8 +2,9 @@
 
 import React from "react";
 import { motion, Variants } from "framer-motion";
+import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, Lock, CheckCircle, Fingerprint } from "lucide-react";
+import { Shield, CheckCircle, Fingerprint } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 
 const SecurityCard: React.FC = () => {
@@ -59,7 +60,7 @@ const SecurityCard: React.FC = () => {
               animate="animate"
             />
             <div className="relative flex items-center gap-2 p-4 bg-gradient-to-r from-primary/10 to-chart-2/10 rounded-2xl border border-primary/20">
-              <img src="/logos/usd-coin-usdc-logo.png" alt="USDC" className="h-8 w-8" />
+              <Image src="/logos/usd-coin-usdc-logo.png" alt="USDC" width={32} height={32} className="h-8 w-8" />
               <span className="text-2xl font-bold text-primary">{t.security.nativeUsdc}</span>
             </div>
           </motion.div>

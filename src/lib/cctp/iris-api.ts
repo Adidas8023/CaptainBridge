@@ -1,6 +1,8 @@
 import { IRIS_API_URL, getChainByDomainId } from './constants';
 import type { IrisMessagesResponse, IrisFeeResponse, IrisAllowanceResponse } from '@/types';
-import { createPublicClient, http, keccak256, encodePacked, defineChain } from 'viem';
+import { defineChain } from 'viem';
+import { createEvmPublicClient } from '@/config/rpc';
+import { logger } from '@/lib/logger';
 
 const API_BASE = IRIS_API_URL;
 
@@ -41,7 +43,7 @@ export async function getAttestation(
     
     return await response.json();
   } catch (error) {
-    console.error('Failed to get attestation:', error);
+    logger.warn('Failed to get attestation:', error);
     return null;
   }
 }
@@ -92,7 +94,7 @@ export async function getTransferFee(
     );
     
     if (!response.ok) {
-      console.log('[Iris] Fee API error:', response.status);
+      logger.info('[Iris] Fee API error:', response.status);
       return null;
     }
     
@@ -114,7 +116,7 @@ export async function getTransferFee(
       standardFeeInBps: standardFee?.minimumFee ?? 0, // Standard Transfer is usually free
     };
   } catch (error) {
-    console.error('[Iris] Fee API failed:', error);
+    logger.warn('[Iris] Fee API failed:', error);
     return null;
   }
 }
@@ -132,7 +134,7 @@ export async function getFastTransferAllowance(): Promise<IrisAllowanceResponse 
     
     return await response.json();
   } catch (error) {
-    console.error('Failed to get fast transfer allowance:', error);
+    logger.warn('Failed to get fast transfer allowance:', error);
     return null;
   }
 }
@@ -162,7 +164,7 @@ export async function reattestMessage(
     
     return await response.json();
   } catch (error) {
-    console.error('Failed to reattest message:', error);
+    logger.warn('Failed to reattest message:', error);
     return null;
   }
 }
@@ -186,7 +188,7 @@ export async function getMessageByNonce(
     
     return await response.json();
   } catch (error) {
-    console.error('Failed to get message by nonce:', error);
+    logger.warn('Failed to get message by nonce:', error);
     return null;
   }
 }
@@ -205,7 +207,7 @@ export async function checkCanClaim(
   try {
     if (!destChain.chainId) {
       // Non-EVM chain, assume can claim (will fail at actual claim if not)
-      console.log(`[CheckClaim] Non-EVM chain, skipping simulation`);
+      logger.info(`[CheckClaim] Non-EVM chain, skipping simulation`);
       return { canClaim: true };
     }
 
@@ -219,12 +221,9 @@ export async function checkCanClaim(
       },
     });
 
-    const client = createPublicClient({
-      chain: customChain,
-      transport: http(destChain.rpcUrl),
-    });
+    const client = createEvmPublicClient(customChain, destChain.rpcUrl);
 
-    console.log(`[CheckClaim] Simulating receiveMessage on chain ${destChain.chainId}`);
+    logger.info(`[CheckClaim] Simulating receiveMessage on chain ${destChain.chainId}`);
 
     // Simulate receiveMessage call
     // If it reverts, the message has already been received or is invalid
@@ -246,11 +245,11 @@ export async function checkCanClaim(
       account: '0x0000000000000000000000000000000000000001',
     });
 
-    console.log(`[CheckClaim] Simulation successful - can claim`);
+    logger.info(`[CheckClaim] Simulation successful - can claim`);
     return { canClaim: true };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.log(`[CheckClaim] Simulation failed:`, errorMessage);
+    logger.info(`[CheckClaim] Simulation failed:`, errorMessage);
     
     // Check if it's a "nonce already used" error
     if (errorMessage.includes('Nonce already used') || 
@@ -283,18 +282,18 @@ export async function checkDestinationTransaction(
 
     const blockscoutBase = BLOCKSCOUT_APIS[destDomainId];
     if (!blockscoutBase) {
-      console.log(`[CheckDest] No Blockscout API for domain ${destDomainId}`);
+      logger.info(`[CheckDest] No Blockscout API for domain ${destDomainId}`);
       return { completed: false };
     }
 
     // 查询接收者地址的 USDC token transfers（mint from 0x0）
     const url = `${blockscoutBase}/api/v2/addresses/${recipientAddress}/token-transfers?token=${destChain.usdcAddress}&type=ERC-20`;
     
-    console.log(`[CheckDest] Querying Blockscout: ${url}`);
+    logger.info(`[CheckDest] Querying Blockscout: ${url}`);
     
     const response = await fetch(url);
     if (!response.ok) {
-      console.error(`[CheckDest] Blockscout API error: ${response.status}`);
+      logger.warn(`[CheckDest] Blockscout API error: ${response.status}`);
       return { completed: false };
     }
 
@@ -313,7 +312,7 @@ export async function checkDestinationTransaction(
       const itemTimestamp = new Date(item.timestamp).getTime();
       const isAfterSource = itemTimestamp >= sourceTxTimestamp - 60000; // 允许 1 分钟误差
 
-      console.log(`[CheckDest] Checking item:`, {
+      logger.info(`[CheckDest] Checking item:`, {
         txHash: item.transaction_hash,
         isFromZero,
         isReceiveMessage,
@@ -324,7 +323,7 @@ export async function checkDestinationTransaction(
       });
 
       if (isFromZero && isReceiveMessage && amountMatch && isAfterSource) {
-        console.log(`[CheckDest] ✅ Found matching transaction: ${item.transaction_hash}`);
+        logger.info(`[CheckDest] Found matching transaction: ${item.transaction_hash}`);
         return {
           completed: true,
           destTxHash: item.transaction_hash,
@@ -332,10 +331,10 @@ export async function checkDestinationTransaction(
       }
     }
 
-    console.log(`[CheckDest] No matching transaction found`);
+    logger.info(`[CheckDest] No matching transaction found`);
     return { completed: false };
   } catch (error) {
-    console.error('[CheckDest] Failed to check destination transaction:', error);
+    logger.warn('[CheckDest] Failed to check destination transaction:', error);
     return { completed: false };
   }
 }

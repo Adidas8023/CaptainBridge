@@ -3,10 +3,11 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useAccount } from 'wagmi';
 import { useAppKitAccount } from '@reown/appkit/react';
-import { createPublicClient, http, formatUnits } from 'viem';
+import { formatUnits, type Chain as ViemChain } from 'viem';
 import { mainnet, arbitrum, optimism, base, polygon, avalanche, linea } from 'viem/chains';
 import type { Chain } from '@/types';
 import { USDC_DECIMALS } from '@/lib/cctp/constants';
+import { createEvmPublicClient, getSolanaRpcUrls } from '@/config/rpc';
 
 // ERC20 balanceOf ABI
 const ERC20_BALANCE_ABI = [
@@ -20,7 +21,7 @@ const ERC20_BALANCE_ABI = [
 ] as const;
 
 // Map chain IDs to viem chain objects
-const VIEM_CHAINS: Record<number, any> = {
+const VIEM_CHAINS: Record<number, ViemChain> = {
   1: mainnet,
   42161: arbitrum,
   10: optimism,
@@ -34,8 +35,7 @@ const VIEM_CHAINS: Record<number, any> = {
 const SOLANA_USDC_MINT = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
 
 // Solana RPC - 从环境变量读取
-const DEFAULT_SOLANA_RPC = 'https://api.mainnet-beta.solana.com';
-const SOLANA_RPC_URL = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || DEFAULT_SOLANA_RPC;
+const SOLANA_RPC_URL = process.env.NEXT_PUBLIC_SOLANA_RPC_URL;
 
 // ===========================================
 // 余额缓存 - 避免重复请求
@@ -102,9 +102,8 @@ export function useUsdcBalance(chain: Chain | null): UseBalanceReturn {
   // EVM 地址
   const { address: evmAddress } = useAccount();
   
-  // Solana 地址 - 从 AppKit allAccounts 获取（支持同时连接 EVM + Solana）
-  const { allAccounts } = useAppKitAccount();
-  const solanaAddress = allAccounts?.find(a => a.namespace === 'solana')?.address;
+  // Solana 地址：显式按 namespace 获取，避免 EVM/Solana 同连时读错账户。
+  const { address: solanaAddress } = useAppKitAccount({ namespace: 'solana' });
 
   const fetchBalance = useCallback(async (skipCache = false) => {
     if (!chain) {
@@ -146,26 +145,7 @@ export function useUsdcBalance(chain: Chain | null): UseBalanceReturn {
 
       if (chain.type === 'evm' && chain.chainId) {
         // EVM 链余额查询
-        const viemChain = VIEM_CHAINS[chain.chainId];
-        
-        const client = createPublicClient({
-          chain: viemChain || {
-            id: chain.chainId,
-            name: chain.name,
-            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-            rpcUrls: {
-              default: { http: [chain.rpcUrl] },
-            },
-          },
-          transport: http(chain.rpcUrl),
-        });
-
-        const result = await client.readContract({
-          address: chain.usdcAddress as `0x${string}`,
-          abi: ERC20_BALANCE_ABI,
-          functionName: 'balanceOf',
-          args: [address as `0x${string}`],
-        });
+        const result = await readEvmUsdcBalance(chain, address);
 
         balanceValue = result as bigint;
         balanceStr = formatUnits(balanceValue, USDC_DECIMALS);
@@ -185,7 +165,7 @@ export function useUsdcBalance(chain: Chain | null): UseBalanceReturn {
       setCachedBalance(chain.id, address, balanceStr, balanceValue);
       
     } catch (err) {
-      console.error('Failed to fetch USDC balance:', err);
+      console.warn('Failed to fetch USDC balance:', err instanceof Error ? err.message : err);
       setError(err instanceof Error ? err.message : 'Failed to fetch balance');
       setBalance('0');
       setRawBalance(BigInt(0));
@@ -232,70 +212,101 @@ export function useUsdcBalance(chain: Chain | null): UseBalanceReturn {
   };
 }
 
+async function readEvmUsdcBalance(chain: Chain, address: string): Promise<bigint> {
+  if (!chain.chainId) return BigInt(0);
+
+  const viemChain = VIEM_CHAINS[chain.chainId] || {
+    id: chain.chainId,
+    name: chain.name,
+    nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+    rpcUrls: {
+      default: { http: [chain.rpcUrl] },
+    },
+  };
+
+  const client = createEvmPublicClient(viemChain, chain.rpcUrl);
+
+  return await client.readContract({
+    address: chain.usdcAddress as `0x${string}`,
+    abi: ERC20_BALANCE_ABI,
+    functionName: 'balanceOf',
+    args: [address as `0x${string}`],
+  });
+}
+
 /**
  * Fetch Solana USDC balance using Helius RPC
  */
 async function fetchSolanaUsdcBalance(walletAddress: string): Promise<bigint> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+  let lastError: unknown;
 
-  try {
-    const response = await fetch(SOLANA_RPC_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'getTokenAccountsByOwner',
-        params: [
-          walletAddress,
-          { mint: SOLANA_USDC_MINT },
-          { encoding: 'jsonParsed' }
-        ]
-      }),
-      signal: controller.signal,
-    });
+  for (const rpcUrl of getSolanaRpcUrls(SOLANA_RPC_URL)) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-    clearTimeout(timeoutId);
+    try {
+      const response = await fetch(rpcUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'getTokenAccountsByOwner',
+          params: [
+            walletAddress,
+            { mint: SOLANA_USDC_MINT },
+            { encoding: 'jsonParsed' }
+          ]
+        }),
+        signal: controller.signal,
+      });
 
-    if (!response.ok) {
-      console.warn(`[Solana RPC] HTTP error: ${response.status}`);
-      return BigInt(0);
-    }
+      clearTimeout(timeoutId);
 
-    const data = await response.json();
-    
-    if (data.error) {
-      console.warn('[Solana RPC] Error:', data.error.message || JSON.stringify(data.error));
-      return BigInt(0);
-    }
+      if (!response.ok) {
+        lastError = new Error(`HTTP ${response.status}`);
+        console.warn(`[Solana RPC] ${rpcUrl} HTTP error: ${response.status}`);
+        continue;
+      }
 
-    const accounts = data.result?.value || [];
-    
-    if (accounts.length === 0) {
-      // 没有 token account 意味着余额为 0
-      return BigInt(0);
-    }
+      const data = await response.json();
 
-    // 聚合所有 token account 余额
-    let total = BigInt(0);
-    for (const acc of accounts) {
-      const amount = acc?.account?.data?.parsed?.info?.tokenAmount?.amount;
-      if (amount) {
-        total += BigInt(amount);
+      if (data.error) {
+        lastError = new Error(data.error.message || JSON.stringify(data.error));
+        console.warn('[Solana RPC] Error:', data.error.message || JSON.stringify(data.error));
+        continue;
+      }
+
+      const accounts = data.result?.value || [];
+
+      if (accounts.length === 0) {
+        // 没有 token account 意味着余额为 0
+        return BigInt(0);
+      }
+
+      // 聚合所有 token account 余额
+      let total = BigInt(0);
+      for (const acc of accounts) {
+        const amount = acc?.account?.data?.parsed?.info?.tokenAmount?.amount;
+        if (amount) {
+          total += BigInt(amount);
+        }
+      }
+
+      return total;
+    } catch (error: unknown) {
+      clearTimeout(timeoutId);
+      lastError = error;
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.warn(`[Solana RPC] ${rpcUrl} request timeout`);
+      } else {
+        console.warn(`[Solana RPC] ${rpcUrl} error:`, error);
       }
     }
-    
-    return total;
-  } catch (error: any) {
-    clearTimeout(timeoutId);
-    if (error.name === 'AbortError') {
-      console.warn('[Solana RPC] Request timeout');
-    } else {
-      console.warn('[Solana RPC] Error:', error);
-    }
-    return BigInt(0);
   }
+
+  console.warn('[Solana RPC] All balance RPC endpoints failed:', lastError);
+  return BigInt(0);
 }
 
 /**

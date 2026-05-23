@@ -14,6 +14,7 @@ export interface Chain {
   tokenMessengerAddress: string;
   messageTransmitterAddress: string;
   fastTransferFee: number; // in basis points (1 bps = 0.01%)
+  supportsFastTransfer?: boolean;
   color: string;
 }
 
@@ -93,4 +94,3 @@ export interface IrisAllowanceResponse {
   used: string;
   remaining: string;
 }
-

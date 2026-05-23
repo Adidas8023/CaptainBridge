@@ -1,6 +1,7 @@
 'use client';
 
 import { useTheme } from 'next-themes';
+import Image from 'next/image';
 import { Header } from '@/components/layout/Header';
 import { BlackholeBackground } from '@/components/layout/BlackholeBackground';
 import { BridgeCard } from '@/components/bridge/BridgeCard';
@@ -31,9 +32,11 @@ export default function BridgePage() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/5 border border-primary/20 hover:bg-primary/10 hover:border-primary/40 transition-all group"
           >
-            <img
+            <Image
               src="/logos/abel-avatar.jpg"
               alt="Abel"
+              width={20}
+              height={20}
               className="w-5 h-5 rounded-full"
             />
             <span className="text-xs text-muted-foreground">{t.footer.builtBy}</span>
@@ -68,4 +71,3 @@ export default function BridgePage() {
     </main>
   );
 }
-

@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { IconMenu2, IconX } from '@tabler/icons-react';
+import { Menu, X } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { LanguageToggle } from './LanguageToggle';
 import { WalletConnector } from '@/components/wallet/WalletConnector';
@@ -21,9 +22,11 @@ export function Header() {
       <div className="flex items-center gap-4 sm:gap-8">
         {/* 品牌 Logo + 名称 */}
         <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group">
-          <img 
+          <Image
             src="/logos/abel-avatar.jpg" 
             alt="Captain's Bridge" 
+            width={32}
+            height={32}
             className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-primary/30 group-hover:border-primary/60 transition-colors"
           />
           {language === 'zh' ? (
@@ -39,7 +42,7 @@ export function Header() {
               className="text-[9px] sm:text-xs tracking-wider uppercase"
               style={{ fontFamily: 'var(--font-pixel), monospace' }}
             >
-              <span className="text-primary">Captain's</span>
+              <span className="text-primary">Captain&apos;s</span>
               <span className="text-foreground"> Bridge</span>
             </span>
           )}
@@ -78,9 +81,9 @@ export function Header() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? (
-              <IconX className="h-4 w-4" />
+              <X className="h-4 w-4" />
             ) : (
-              <IconMenu2 className="h-4 w-4" />
+              <Menu className="h-4 w-4" />
             )}
           </Button>
         </div>

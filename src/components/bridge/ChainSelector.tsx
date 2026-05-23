@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { IconChevronRight } from '@tabler/icons-react';
+import { ChevronRight } from 'lucide-react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -18,7 +19,6 @@ import {
 } from '@/components/ui/popover';
 import type { Chain } from '@/types';
 import { CHAINS } from '@/lib/cctp/constants';
-import { useUsdcBalance } from '@/lib/hooks/useBalance';
 import { useTranslation } from '@/lib/i18n';
 
 // 当前 AppKit/Wagmi 已配置支持的链，防止选择未配置导致无法连接/读余额
@@ -40,6 +40,10 @@ const SUPPORTED_CHAIN_IDS = new Set([
   'hyperevm',
   'ink',
   'plume',
+  'edge',
+  'injective',
+  'morph',
+  'pharos',
 ]);
 
 interface ChainSelectorProps {
@@ -91,7 +95,7 @@ export function ChainSelector({
                   {formatBalanceCompact(balance)}
                 </span>
               )}
-              <IconChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+              <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
             </div>
           </Button>
         </PopoverTrigger>
@@ -119,7 +123,7 @@ export function ChainSelector({
                         <ChainIcon chain={chain} />
                         <span className="font-medium">{chain.name}</span>
                       </div>
-                      <ChainUsdcBalance chain={chain} enabled={open} />
+                      <span className="text-sm text-muted-foreground">USDC</span>
                     </CommandItem>
                   ))}
                 </CommandGroup>
@@ -133,48 +137,32 @@ export function ChainSelector({
 }
 
 function ChainIcon({ chain }: { chain: Chain }) {
+  const [hasError, setHasError] = useState(false);
+
+  if (hasError) {
+    return (
+      <div
+        className="w-8 h-8 rounded-full flex items-center justify-center shadow-sm"
+        style={{ backgroundColor: chain.color }}
+      >
+        <span className="text-white text-xs font-bold">{chain.name.charAt(0)}</span>
+      </div>
+    );
+  }
+
   return (
     <div className="w-8 h-8 rounded-full overflow-hidden bg-muted flex items-center justify-center shadow-sm">
-      <img
+      <Image
         src={chain.icon}
         alt={chain.name}
+        width={32}
+        height={32}
+        unoptimized
         className="w-full h-full object-cover"
-        onError={(e) => {
-          // Fallback to colored circle with initial
-          const target = e.currentTarget;
-          target.style.display = 'none';
-          const parent = target.parentElement;
-          if (parent) {
-            parent.style.backgroundColor = chain.color;
-            parent.innerHTML = `<span class="text-white text-xs font-bold">${chain.name.charAt(0)}</span>`;
-          }
-        }}
+        onError={() => setHasError(true)}
       />
     </div>
   );
-}
-
-function ChainUsdcBalance({ chain, enabled }: { chain: Chain; enabled: boolean }) {
-  // 只在弹窗打开时拉取列表余额，避免页面初始就并发请求所有链
-  const { balance, isLoading } = useUsdcBalance(enabled ? chain : null);
-  const text = enabled ? (isLoading ? '...' : formatBalanceFloor(balance)) : '—';
-  return <span className="text-sm text-muted-foreground">{text} USDC</span>;
-}
-
-// 列表展示：截断（floor）避免四舍五入造成"显示比实际大"，最多2位小数
-function formatBalanceFloor(balance: string, decimals: number = 2): string {
-  if (!balance) return '0';
-  const normalized = balance.trim();
-  if (normalized === '' || normalized === '0') return '0';
-
-  const num = parseFloat(normalized);
-  if (isNaN(num) || num === 0) return '0';
-
-  const [intPartRaw, fracRaw = ''] = normalized.split('.');
-  const intPart = intPartRaw.replace(/^0+(?=\d)/, '') || '0';
-  const frac = fracRaw.slice(0, decimals).replace(/0+$/, '');
-  const intWithCommas = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  return frac ? `${intWithCommas}.${frac}` : intWithCommas;
 }
 
 // 紧凑显示余额（用于按钮内），最多2位小数

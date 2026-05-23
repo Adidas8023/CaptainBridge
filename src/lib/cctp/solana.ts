@@ -442,17 +442,6 @@ function readUInt32BE(arr: Uint8Array, offset: number): number {
 }
 
 /**
- * Helper: read big-endian u64 from Uint8Array
- */
-function readBigUInt64BE(arr: Uint8Array, offset: number): bigint {
-  let result = BigInt(0);
-  for (let i = 0; i < 8; i++) {
-    result = (result << BigInt(8)) | BigInt(arr[offset + i]);
-  }
-  return result;
-}
-
-/**
  * Helper: convert hex string to Uint8Array
  */
 function hexToUint8Array(hex: string): Uint8Array {
@@ -476,7 +465,6 @@ function hexToUint8Array(hex: string): Uint8Array {
  * - ...
  */
 export function parseMessage(message: Uint8Array): { sourceDomain: number; destinationDomain: number; nonce: Uint8Array } {
-  const version = readUInt32BE(message, 0);
   const sourceDomain = readUInt32BE(message, 4);
   const destinationDomain = readUInt32BE(message, 8);
   // CCTP V2: nonce is 32 bytes (bytes32), not 8 bytes!
@@ -522,7 +510,7 @@ export function createReceiveMessageInstruction(
   const attestationBuffer = hexToUint8Array(attestationHex);
   
   // Parse message to get source domain and nonce
-  const { sourceDomain, destinationDomain, nonce } = parseMessage(messageBuffer);
+  const { sourceDomain, nonce } = parseMessage(messageBuffer);
   
   // Find all required PDAs
   const [messageTransmitterState] = findMessageTransmitterStatePda();
@@ -595,4 +583,3 @@ export {
   TOKEN_PROGRAM_ID,
   ASSOCIATED_TOKEN_PROGRAM_ID,
 };
-

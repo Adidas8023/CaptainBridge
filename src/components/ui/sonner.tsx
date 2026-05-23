@@ -1,12 +1,12 @@
 "use client"
 
 import {
-  IconCircleCheckFilled,
-  IconInfoCircleFilled,
-  IconLoader2,
-  IconAlertCircleFilled,
-  IconAlertTriangleFilled,
-} from "@tabler/icons-react"
+  CircleAlert,
+  CircleCheck,
+  Info,
+  Loader2,
+  TriangleAlert,
+} from "lucide-react"
 import { useTheme } from "next-themes"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
 
@@ -40,11 +40,11 @@ const Toaster = ({ ...props }: ToasterProps) => {
         duration: 3000,
       }}
       icons={{
-        success: <IconCircleCheckFilled className="size-5 text-emerald-500" />,
-        info: <IconInfoCircleFilled className="size-5 text-blue-500" />,
-        warning: <IconAlertTriangleFilled className="size-5 text-amber-500" />,
-        error: <IconAlertCircleFilled className="size-5 text-red-500" />,
-        loading: <IconLoader2 className="size-5 text-primary animate-spin" />,
+        success: <CircleCheck className="size-5 text-emerald-500" />,
+        info: <Info className="size-5 text-blue-500" />,
+        warning: <TriangleAlert className="size-5 text-amber-500" />,
+        error: <CircleAlert className="size-5 text-red-500" />,
+        loading: <Loader2 className="size-5 text-primary animate-spin" />,
       }}
       {...props}
     />

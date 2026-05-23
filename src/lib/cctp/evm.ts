@@ -1,6 +1,5 @@
 import { 
   type Address, 
-  type Hash,
   encodeFunctionData,
   parseUnits,
   maxUint256,
@@ -142,8 +141,14 @@ export function calculateMaxFee(
   bufferPercent: number = 5
 ): bigint {
   const amountInUnits = parseUnits(amount, USDC_DECIMALS);
-  const feeAmount = (amountInUnits * BigInt(feePercentBps)) / BigInt(10000);
-  const buffer = (feeAmount * BigInt(bufferPercent)) / BigInt(100);
+  if (!Number.isFinite(feePercentBps) || feePercentBps <= 0) return BigInt(0);
+
+  // Iris can return decimal bps (for example 1.3 bps). Scale before BigInt math.
+  const scale = BigInt(1000);
+  const scaledBps = BigInt(Math.ceil(feePercentBps * Number(scale)));
+  const denominator = BigInt(10000) * scale;
+  const feeAmount = (amountInUnits * scaledBps + denominator - BigInt(1)) / denominator;
+  const buffer = (feeAmount * BigInt(bufferPercent) + BigInt(99)) / BigInt(100);
   return feeAmount + buffer;
 }
 
@@ -231,4 +236,3 @@ export function buildClaimTransaction(
 }
 
 export { ERC20_ABI, TOKEN_MESSENGER_V2_ABI, MESSAGE_TRANSMITTER_V2_ABI };
-

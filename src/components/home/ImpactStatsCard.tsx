@@ -5,6 +5,7 @@ import { motion, Variants } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Layers, Clock, Zap, Shield, TrendingUp } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
+import { CHAINS } from "@/lib/cctp/constants";
 
 const ImpactStatsCard: React.FC = () => {
   const { t } = useTranslation();
@@ -61,7 +62,7 @@ const ImpactStatsCard: React.FC = () => {
                 transition={{ type: "spring", stiffness: 500, damping: 15, delay: 0.4 }}
                 viewport={{ once: true }}
               >
-                17
+                {CHAINS.length}
               </motion.span>
               <span className="text-sm text-muted-foreground block">{t.stats.supportedChains}</span>
             </div>
