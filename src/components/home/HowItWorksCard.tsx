@@ -56,14 +56,37 @@ const HowItWorksCard: React.FC = () => {
     return () => clearInterval(interval);
   }, [isAnimating, steps.length]);
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const stepVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: 20 },
+  };
+
   return (
     <Card className="h-full glass-card hover-lift group border-border/50 bg-card/50 relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-4 right-4">
-          <div>
+          <motion.div
+            animate={{ rotate: isAnimating ? [0, 360] : 0 }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          >
             <Coins className="h-12 w-12 text-primary" />
-          </div>
+          </motion.div>
         </div>
       </div>
 
@@ -90,7 +113,12 @@ const HowItWorksCard: React.FC = () => {
 
       <CardContent className="space-y-6">
         {/* Steps Flow */}
-        <div className="space-y-4">
+        <motion.div
+          className="space-y-4"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
           {steps.map((step, index) => {
             const Icon = step.icon;
             const isActive = currentStep === index;
@@ -102,8 +130,9 @@ const HowItWorksCard: React.FC = () => {
                 className={`relative flex items-center gap-4 p-3 rounded-lg transition-all duration-500 ${
                   isActive
                     ? `${step.bgColor} border border-current/20 shadow-lg`
-                    : 'hover:bg-muted/10'
+                  : 'hover:bg-muted/10'
                 }`}
+                variants={stepVariants}
                 whileHover={{ scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
               >
@@ -113,8 +142,13 @@ const HowItWorksCard: React.FC = () => {
                     className={`p-2 rounded-lg ${
                       isActive || isCompleted ? step.bgColor : 'bg-muted/20'
                     }`}
-                    animate={{ scale: isActive ? 1.05 : 1 }}
-                    transition={{ duration: 0.2 }}
+                    animate={{
+                      scale: isActive ? [1, 1.1, 1] : 1,
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: isActive ? Infinity : 0,
+                    }}
                   >
                     <Icon
                       className={`h-5 w-5 ${
@@ -127,9 +161,13 @@ const HowItWorksCard: React.FC = () => {
                   {isActive && (
                     <motion.div
                       className="absolute inset-0 rounded-lg border-2 border-current/30"
-                      initial={{ scale: 0.95, opacity: 0 }}
-                      animate={{ scale: 1.1, opacity: 0.35 }}
-                      transition={{ duration: 0.25 }}
+                      initial={{ scale: 1, opacity: 1 }}
+                      animate={{ scale: 1.3, opacity: 0 }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeOut",
+                      }}
                     />
                   )}
                 </div>
@@ -182,7 +220,7 @@ const HowItWorksCard: React.FC = () => {
               </motion.div>
             );
           })}
-        </div>
+        </motion.div>
 
         {/* Progress Indicator */}
         <div className="flex justify-center gap-1.5 pt-2">
@@ -202,13 +240,16 @@ const HowItWorksCard: React.FC = () => {
         </div>
 
         {/* Bottom Info */}
-        <div
+        <motion.div
           className="text-center pt-2 border-t border-border/20"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
         >
           <p className="text-xs text-muted-foreground">
             Powered by Circle CCTP V2 Protocol
           </p>
-        </div>
+        </motion.div>
       </CardContent>
     </Card>
   );

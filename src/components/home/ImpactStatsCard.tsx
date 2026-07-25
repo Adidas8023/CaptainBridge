@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion, Variants } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Layers, Clock, Zap, Shield, TrendingUp } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
@@ -8,11 +9,27 @@ import { CHAINS } from "@/lib/cctp/constants";
 
 const ImpactStatsCard: React.FC = () => {
   const { t } = useTranslation();
+  const breathingVariants: Variants = {
+    animate: {
+      scale: [1, 1.08, 1],
+      opacity: [0.6, 0.9, 0.6],
+      transition: {
+        duration: 5,
+        ease: "easeInOut" as const,
+        repeat: Number.POSITIVE_INFINITY
+      }
+    }
+  };
+
   return (
     <Card className="h-full glass-card hover-lift group border-border/50 bg-card/50 relative overflow-hidden">
       {/* Gradient Background */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -bottom-4 -right-4 h-32 w-32 rounded-full bg-gradient-to-br from-chart-2/40 to-primary/40 opacity-20 blur-xl" />
+        <motion.div
+          variants={breathingVariants}
+          animate="animate"
+          className="absolute -bottom-4 -right-4 w-32 h-32 opacity-20 bg-gradient-to-br from-chart-2/40 to-primary/40 rounded-full blur-2xl"
+        />
       </div>
 
       <CardHeader className="relative z-10">
@@ -27,25 +44,37 @@ const ImpactStatsCard: React.FC = () => {
         {/* Stats List */}
         <div className="space-y-4">
           {/* Chains */}
-          <div
+          <motion.div
             className="flex items-center gap-3"
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
+            viewport={{ once: true }}
           >
             <div className="p-2 bg-primary/10 rounded-lg">
               <Layers className="h-4 w-4 text-primary" />
             </div>
             <div className="flex-1">
-              <span
+              <motion.span
                 className="text-2xl font-bold text-primary"
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 500, damping: 15, delay: 0.4 }}
+                viewport={{ once: true }}
               >
                 {CHAINS.length}
-              </span>
+              </motion.span>
               <span className="text-sm text-muted-foreground block">{t.stats.supportedChains}</span>
             </div>
-          </div>
+          </motion.div>
 
           {/* Transfer Modes */}
-          <div
+          <motion.div
             className="p-3 rounded-xl bg-muted/30 border border-border/50"
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
+            viewport={{ once: true }}
           >
             <p className="text-xs text-muted-foreground mb-2 font-medium">{t.stats.transferSpeed}</p>
             <div className="flex items-center justify-between gap-2">
@@ -69,34 +98,46 @@ const ImpactStatsCard: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Protocol Version */}
-          <div
+          <motion.div
             className="flex items-center gap-3"
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.4, ease: "easeOut" }}
+            viewport={{ once: true }}
           >
             <div className="p-2 bg-chart-3/10 rounded-lg">
               <Shield className="h-4 w-4 text-chart-3" />
             </div>
             <div className="flex-1">
-              <span
+              <motion.span
                 className="text-2xl font-bold text-chart-3"
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 500, damping: 15, delay: 0.6 }}
+                viewport={{ once: true }}
               >
                 CCTP V2
-              </span>
+              </motion.span>
               <span className="text-sm text-muted-foreground block">{t.stats.protocolVersion}</span>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Bottom Info */}
-        <div
+        <motion.div
           className="pt-4 border-t border-border/30"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+          viewport={{ once: true }}
         >
           <p className="text-xs text-muted-foreground text-center">
             {t.stats.growingDaily}
           </p>
-        </div>
+        </motion.div>
       </CardContent>
     </Card>
   );

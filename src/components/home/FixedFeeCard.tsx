@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, CheckCircle, Fingerprint } from "lucide-react";
@@ -9,6 +9,29 @@ import { useTranslation } from "@/lib/i18n";
 
 const SecurityCard: React.FC = () => {
   const { t } = useTranslation();
+  const pulseVariants: Variants = {
+    animate: {
+      scale: [1, 1.05, 1],
+      opacity: [0.7, 1, 0.7],
+      transition: {
+        duration: 2,
+        repeat: Number.POSITIVE_INFINITY,
+        ease: "easeInOut" as const,
+      },
+    },
+  };
+
+  const floatVariants: Variants = {
+    animate: {
+      y: [-5, 5, -5],
+      transition: {
+        duration: 3,
+        repeat: Number.POSITIVE_INFINITY,
+        ease: "easeInOut" as const,
+      },
+    },
+  };
+
   return (
     <Card className="h-full glass-card hover-lift group border-border/50 bg-card/50 relative overflow-hidden">
       {/* Background Gradient */}
@@ -26,13 +49,21 @@ const SecurityCard: React.FC = () => {
       <CardContent className="space-y-6 relative">
         {/* Main Security Display */}
         <div className="text-center space-y-3">
-          <div className="relative inline-flex items-center">
-            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/20 to-chart-2/20 blur-lg" />
+          <motion.div
+            className="relative inline-flex items-center"
+            variants={floatVariants}
+            animate="animate"
+          >
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-primary/20 to-chart-2/20 rounded-full blur-xl"
+              variants={pulseVariants}
+              animate="animate"
+            />
             <div className="relative flex items-center gap-2 p-4 bg-gradient-to-r from-primary/10 to-chart-2/10 rounded-2xl border border-primary/20">
               <Image src="/logos/usd-coin-usdc-logo.png" alt="USDC" width={32} height={32} className="h-8 w-8" />
               <span className="text-2xl font-bold text-primary">{t.security.nativeUsdc}</span>
             </div>
-          </div>
+          </motion.div>
           
           <p className="text-sm text-muted-foreground">
             {t.security.burnMint}
@@ -76,8 +107,12 @@ const SecurityCard: React.FC = () => {
         </div>
 
         {/* Bottom Badge */}
-        <div
+        <motion.div
           className="pt-4 border-t border-border/30"
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          viewport={{ once: true }}
         >
           <div className="text-center">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-primary/10 to-chart-2/10 rounded-full border border-primary/20">
@@ -85,13 +120,22 @@ const SecurityCard: React.FC = () => {
               <span className="text-xs font-medium text-primary">{t.security.circleVerified}</span>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Decorative Element */}
         <div className="absolute top-1 right-1 opacity-10">
-          <div>
+          <motion.div
+            animate={{
+              rotate: [0, 360],
+            }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          >
             <Shield className="h-8 w-8 text-primary" />
-          </div>
+          </motion.div>
         </div>
       </CardContent>
     </Card>

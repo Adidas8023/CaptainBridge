@@ -136,11 +136,11 @@ const Planet = memo(({
         >
           <Image
             src={logo.src}
-            alt=""
+            alt={logo.name}
             width={32}
             height={32}
             className="w-6 h-6 md:w-7 md:h-7 object-contain"
-            loading="lazy"
+            loading="eager"
           />
         </div>
       </div>
@@ -228,7 +228,6 @@ export function BlackholeBackground() {
   return (
     <div 
       className="fixed inset-0 overflow-hidden pointer-events-none z-0"
-      aria-hidden="true"
       style={{
         // 使用 content-visibility 优化渲染
         contentVisibility: 'auto',

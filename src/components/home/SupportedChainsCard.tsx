@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Layers, ExternalLink } from "lucide-react";
 import Image from "next/image";
@@ -57,7 +58,15 @@ const SupportedChainsCard: React.FC = () => {
       <CardContent className="space-y-4">
         {/* Scrolling Chain Icons */}
         <div className="relative overflow-hidden rounded-lg bg-muted/20 p-4 pb-8">
-          <div className="chains-marquee flex w-max items-center">
+          <motion.div
+            className="flex w-max items-center"
+            animate={{ x: ["0%", "-50%"] }}
+            transition={{
+              duration: 30,
+              repeat: Number.POSITIVE_INFINITY,
+              ease: "linear",
+            }}
+          >
             {[0, 1].map((groupIndex) => (
               <div
                 key={groupIndex}
@@ -65,9 +74,11 @@ const SupportedChainsCard: React.FC = () => {
                 aria-hidden={groupIndex === 1}
               >
                 {supportedChains.map((chain) => (
-                  <div
+                  <motion.div
                     key={`${groupIndex}-${chain.name}`}
-                    className="group relative h-16 w-16 shrink-0 transition-transform duration-200 hover:z-10 hover:scale-105"
+                    className="group relative h-16 w-16 shrink-0"
+                    whileHover={{ scale: 1.1, zIndex: 10 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
                   >
                     <div
                       className={`flex h-full w-full items-center justify-center rounded-xl bg-gradient-to-br ${chain.color} p-2 shadow-lg`}
@@ -83,11 +94,11 @@ const SupportedChainsCard: React.FC = () => {
                     <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-background/90 px-2 py-1 text-xs font-medium text-muted-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                       {chain.name}
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             ))}
-          </div>
+          </motion.div>
         </div>
 
         {/* Chain Details */}
