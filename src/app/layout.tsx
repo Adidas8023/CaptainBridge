@@ -24,6 +24,7 @@ const silkscreen = Silkscreen({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://bridge.abelai.app'),
   title: "Captain's Bridge | Cross-Chain USDC Transfer",
   description: 'Bridge USDC across chains instantly with Circle CCTP V2. Zero extra fees. Support for Ethereum, Arbitrum, Base, Solana, and more.',
   keywords: ["Captain's Bridge", 'CCTP', 'USDC', 'bridge', 'cross-chain', 'Circle', 'crypto', 'Abel船长'],
@@ -31,6 +32,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Captain's Bridge | Cross-Chain USDC Transfer",
     description: 'Bridge USDC across chains instantly with Circle CCTP V2. Zero extra fees.',
+    url: 'https://bridge.abelai.app',
     type: 'website',
   },
 };

@@ -1,4 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-  <rect width="48" height="48" rx="24" fill="#3B82F6"/>
-  <path d="M16 36V12h11c5 0 9 3 9 8s-4 8-9 8h-5v8zm6-13h4c2 0 4-1 4-3s-2-3-4-3h-4z" fill="#fff"/>
+<svg viewBox="171 95 49 62" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M215.597 109.848L201.259 103.388L191.549 105.655V106.335L203.855 112.909L215.597 109.962V109.848Z" fill="url(#pharos-top)"/>
+  <path d="M219.887 130.704L202.274 122.543L187.935 126.397V127.303L203.064 135.691L220 130.704H219.887Z" fill="url(#pharos-middle)"/>
+  <path d="M191.549 106.335L201.259 104.068L212.097 101.574V95L191.549 99.5338V106.335Z" fill="#0007B9"/>
+  <path d="M215.597 109.848L203.855 112.795L187.935 116.762V127.303L202.274 123.45L215.597 119.823V109.848Z" fill="#0007B9"/>
+  <path d="M171 145.212C174.387 150.086 178.903 154.166 184.21 157L219.887 145.325V130.704L202.952 135.691L171 145.099V145.212Z" fill="#0007B9"/>
+  <defs>
+    <linearGradient id="pharos-top" x1="196.359" y1="111.005" x2="210.788" y2="111.005" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0007B9"/>
+      <stop offset="1" stop-color="white" stop-opacity="0.01"/>
+    </linearGradient>
+    <linearGradient id="pharos-middle" x1="194.235" y1="122.747" x2="213.474" y2="122.747" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0007B9"/>
+      <stop offset="1" stop-color="white" stop-opacity="0.01"/>
+    </linearGradient>
+  </defs>
 </svg>

@@ -1,9 +1,11 @@
 import { type Chain as ViemChain, type EIP1193Provider } from 'viem';
+import type { ViemAdapter } from '@circle-fin/adapter-viem-v2';
+import type { SolanaAdapter } from '@circle-fin/adapter-solana';
 import type { Chain } from '@/types';
 import { createSolanaConnection } from '@/config/wallet';
 import { createEvmPublicClient } from '@/config/rpc';
 
-export type BridgeAdapter = unknown;
+export type BridgeAdapter = ViemAdapter | SolanaAdapter;
 export type SolanaBridgeProvider = {
   isConnected?: boolean;
   connect?: () => Promise<unknown>;
@@ -36,7 +38,8 @@ type BridgeKitChain =
   | 'Edge'
   | 'Injective'
   | 'Morph'
-  | 'Pharos';
+  | 'Pharos'
+  | 'Cronos';
 
 type TransferSpeed = 'FAST' | 'SLOW';
 
@@ -83,6 +86,7 @@ const BRIDGE_CHAIN_BY_DOMAIN: Record<number, BridgeKitChain> = {
   29: 'Injective',
   30: 'Morph',
   31: 'Pharos',
+  32: 'Cronos',
 };
 
 // Circle CCTP v2 fast-transfer source support. Starknet intentionally omitted.

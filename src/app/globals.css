@@ -243,8 +243,8 @@
    Card Glassmorphism Effect
    ============================================ */
 .glass-card {
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--border);
   box-shadow: 
     0 4px 6px -1px rgba(0, 0, 0, 0.1),
@@ -395,6 +395,24 @@
   animation: pulse-glow 2s ease-in-out infinite;
 }
 
+@keyframes chains-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.chains-marquee {
+  animation: chains-marquee 42s linear infinite;
+  will-change: transform;
+}
+
+.chains-marquee:hover {
+  animation-play-state: paused;
+}
+
 /* ============================================
    Blackhole Background Enhancements
    ============================================ */
@@ -520,6 +538,28 @@
 
 .planet-icon:hover {
   transform: translate(-50%, -50%) scale(1.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chains-marquee,
+  .planet-orbit-x,
+  .planet-orbit-x-reverse,
+  .planet-orbit-y,
+  .planet-orbit-y-reverse,
+  .animate-pulse-glow,
+  .chain-icon-float,
+  .blackhole-glow {
+    animation: none !important;
+  }
+
+  .hover-lift,
+  .planet-icon {
+    transition: none !important;
+  }
+
+  .hover-lift:hover {
+    transform: none;
+  }
 }
 
 /* ============================================

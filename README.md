@@ -30,6 +30,7 @@
   - [支持网络](#支持网络)
   - [技术架构](#技术架构)
   - [本地运行](#本地运行)
+  - [Cloudflare 部署](#cloudflare-部署)
   - [环境变量](#环境变量)
   - [安全与提交规则](#安全与提交规则)
   - [常用命令](#常用命令)
@@ -39,6 +40,7 @@
   - [Supported Networks](#supported-networks)
   - [Architecture](#architecture)
   - [Local Development](#local-development)
+  - [Cloudflare Deployment](#cloudflare-deployment)
   - [Environment Variables](#environment-variables)
   - [Security And Git Hygiene](#security-and-git-hygiene)
   - [Scripts](#scripts)
@@ -67,11 +69,11 @@ CaptainBridge 是一个基于 **Next.js 16**、**Circle CCTP v2**、**Reown AppK
 
 ### 支持网络
 
-当前配置共 **22** 条主网：
+当前配置共 **23** 条主网：
 
 | EVM | Solana |
 | --- | --- |
-| Ethereum, Avalanche, OP Mainnet, Arbitrum One, Base, Polygon, Unichain, Linea Mainnet, Codex, Sonic, World Chain, Monad, Sei Network, XDC Network, HyperEVM, Ink, Plume, Edge, Injective, Morph, Pharos | Solana |
+| Ethereum, Avalanche, OP Mainnet, Arbitrum One, Base, Polygon, Unichain, Linea Mainnet, Codex, Cronos, Sonic, World Chain, Monad, Sei Network, XDC Network, HyperEVM, Ink, Plume, Edge, Injective, Morph, Pharos | Solana |
 
 > Starknet 当前不在范围内。
 
@@ -126,6 +128,25 @@ http://localhost:3000
 npm run build
 npm run start
 ```
+
+### Cloudflare 部署
+
+项目使用 Cloudflare Workers + OpenNext，生产域名已在 `wrangler.jsonc` 配置为：
+
+```text
+https://bridge.abelai.app
+```
+
+部署前确保 `abelai.app` 已接入当前 Cloudflare 账户，且 `bridge.abelai.app` 没有冲突的 CNAME。`NEXT_PUBLIC_REOWN_PROJECT_ID` 是构建期变量，必须在构建前设置。
+
+```bash
+npm run cf:typegen
+npm run cf:build
+npm run preview
+npm run deploy
+```
+
+`npm run preview` 使用 Cloudflare `workerd` 运行时；部署前应至少完成一次该预览验证。
 
 ### 环境变量
 
@@ -190,11 +211,11 @@ The app is non-custodial. It does not store private keys. Wallet connection, sig
 
 ### Supported Networks
 
-The current mainnet registry includes **22** networks:
+The current mainnet registry includes **23** networks:
 
 | EVM | Solana |
 | --- | --- |
-| Ethereum, Avalanche, OP Mainnet, Arbitrum One, Base, Polygon, Unichain, Linea Mainnet, Codex, Sonic, World Chain, Monad, Sei Network, XDC Network, HyperEVM, Ink, Plume, Edge, Injective, Morph, Pharos | Solana |
+| Ethereum, Avalanche, OP Mainnet, Arbitrum One, Base, Polygon, Unichain, Linea Mainnet, Codex, Cronos, Sonic, World Chain, Monad, Sei Network, XDC Network, HyperEVM, Ink, Plume, Edge, Injective, Morph, Pharos | Solana |
 
 > Starknet is intentionally out of scope for now.
 
@@ -249,6 +270,25 @@ Production build:
 npm run build
 npm run start
 ```
+
+### Cloudflare Deployment
+
+The app uses Cloudflare Workers with OpenNext. The production custom domain is configured in `wrangler.jsonc`:
+
+```text
+https://bridge.abelai.app
+```
+
+Before deployment, ensure `abelai.app` is active in the current Cloudflare account and that no conflicting CNAME exists for `bridge.abelai.app`. `NEXT_PUBLIC_REOWN_PROJECT_ID` is required at build time.
+
+```bash
+npm run cf:typegen
+npm run cf:build
+npm run preview
+npm run deploy
+```
+
+`npm run preview` executes the app in Cloudflare's `workerd` runtime and should pass before production deployment.
 
 ### Environment Variables
 

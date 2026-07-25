@@ -10,7 +10,7 @@ import { useTranslation } from '@/lib/i18n';
 import type { Chain, BridgeTransaction } from '@/types';
 import { useHistoryStore } from '@/store/history-store';
 import { useBridgeStore } from '@/store/bridge-store';
-import { useAppKitAccount } from '@reown/appkit/react';
+import { useAppKitAccount, useAppKitProvider } from '@reown/appkit/react';
 import { buildClaimTransaction } from '@/lib/cctp/evm';
 import { createReceiveMessageInstruction, SOLANA_USDC_MINT, extractMintRecipientFromMessage } from '@/lib/cctp/solana';
 import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
@@ -64,7 +64,7 @@ interface UseBridgeReturn {
 
 // Generate unique transaction ID
 function generateTxId(): string {
-  return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+  return globalThis.crypto.randomUUID();
 }
 
 const SOLANA_MIN_CCTP_LAMPORTS = 3_000_000; // 0.003 SOL, covers CCTP tx fees and possible account rent.
@@ -130,11 +130,13 @@ export function useBridge(): UseBridgeReturn {
   const [currentTx, setCurrentTx] = useState<BridgeTransaction | null>(null);
   const { t } = useTranslation();
 
-  const { address, chain: connectedChain } = useAccount();
+  const { address, chain: connectedChain, connector } = useAccount();
   
   // ✅ 显式按 namespace 获取 Solana 账户
   const solanaAppKitAccount = useAppKitAccount({ namespace: 'solana' });
   const solanaAddress = solanaAppKitAccount.address;
+  const { walletProvider: solanaWalletProvider } =
+    useAppKitProvider<SolanaTransactionProvider>('solana');
   
   const { switchChainAsync } = useSwitchChain();
   const config = useConfig();
@@ -175,17 +177,16 @@ export function useBridge(): UseBridgeReturn {
       throw new Error('Wallet is only available in the browser');
     }
 
-    const browserWindow = window as BridgeBrowserWindow;
-
     if (chain.type === 'evm') {
-      if (!browserWindow.ethereum) {
+      const activeProvider = await connector?.getProvider();
+      if (!activeProvider) {
         throw new Error('请安装 MetaMask 或其他 EVM 钱包');
       }
 
-      return createEvmBridgeAdapter(browserWindow.ethereum);
+      return createEvmBridgeAdapter(activeProvider as EIP1193Provider);
     }
 
-    const solanaProvider = getBrowserSolanaProvider();
+    const solanaProvider = solanaWalletProvider ?? getBrowserSolanaProvider();
     if (!solanaProvider) {
       throw new Error('请安装 Phantom 或 Solflare 钱包');
     }
@@ -195,7 +196,7 @@ export function useBridge(): UseBridgeReturn {
     }
 
     return createSolanaBridgeAdapter(solanaProvider);
-  }, []);
+  }, [connector, solanaWalletProvider]);
 
   const executeBridgeKit = useCallback(async () => {
     if (!sourceChain || !destChain || !amount || !recipient) {
@@ -574,7 +575,7 @@ export function useBridge(): UseBridgeReturn {
         transaction.feePayer = userPubkey;
 
         // 获取 Solana 钱包
-        const wallet = getBrowserSolanaProvider();
+        const wallet = solanaWalletProvider ?? getBrowserSolanaProvider();
         if (!wallet) {
           throw new Error('未检测到 Solana 钱包');
         }
@@ -643,6 +644,7 @@ export function useBridge(): UseBridgeReturn {
     t.toast.creatingTokenAccount,
     t.toast.nonceAlreadyUsed,
     t.toast.nonceUsedHint,
+    solanaWalletProvider,
   ]);
 
   /**
@@ -772,7 +774,7 @@ export function useBridge(): UseBridgeReturn {
           transaction.feePayer = userPubkey;
 
           // 获取 Solana 钱包
-          const wallet = getBrowserSolanaProvider();
+          const wallet = solanaWalletProvider ?? getBrowserSolanaProvider();
           if (!wallet) {
             throw new Error('未检测到 Solana 钱包');
           }
@@ -832,6 +834,7 @@ export function useBridge(): UseBridgeReturn {
       t.toast.creatingTokenAccount,
       t.toast.nonceAlreadyUsed,
       t.toast.nonceUsedHint,
+      solanaWalletProvider,
     ]
   );
 

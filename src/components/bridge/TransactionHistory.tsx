@@ -20,8 +20,8 @@ import { logger } from '@/lib/logger';
  */
 function useHasHydrated() {
   return useSyncExternalStore(
-    useHistoryStore.persist.onFinishHydration,
-    useHistoryStore.persist.hasHydrated,
+    (onStoreChange) => useHistoryStore.persist?.onFinishHydration(onStoreChange) ?? (() => {}),
+    () => useHistoryStore.persist?.hasHydrated() ?? false,
     () => false
   );
 }

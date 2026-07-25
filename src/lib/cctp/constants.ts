@@ -366,6 +366,22 @@ export const CHAINS: Chain[] = [
     supportsFastTransfer: false,
     color: '#3B82F6',
   },
+  {
+    id: 'cronos',
+    name: 'Cronos',
+    domainId: 32,
+    type: 'evm',
+    chainId: 25,
+    icon: '/logos/cronos.svg',
+    rpcUrl: getRpcUrl('NEXT_PUBLIC_CRONOS_RPC_URL', DEFAULT_RPC.cronos),
+    explorerUrl: 'https://cronoscan.com',
+    usdcAddress: '0x3D7F2C478aAfdB65542BCB44bCeeC05849999d2D',
+    tokenMessengerAddress: '0x28b5a0e9C621a5BadaA536219b3a228C8168cf5d',
+    messageTransmitterAddress: '0x81D40F21F12A8F0E3252Bccb954D722d4c464B64',
+    fastTransferFee: 0,
+    supportsFastTransfer: false,
+    color: '#4CDBFF',
+  },
 ];
 
 // Helper functions

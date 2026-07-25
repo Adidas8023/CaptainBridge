@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -15,13 +15,13 @@ export default function Home() {
   const { t } = useTranslation();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  const toggleFaq = (index: number) => {
-    setOpenFaq(openFaq === index ? null : index);
-  };
+  const toggleFaq = useCallback((index: number) => {
+    setOpenFaq((current) => current === index ? null : index);
+  }, []);
 
-  const handleStartTransfer = () => {
+  const handleStartTransfer = useCallback(() => {
     router.push('/bridge');
-  };
+  }, [router]);
 
   return (
     <main

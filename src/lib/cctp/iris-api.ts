@@ -6,6 +6,28 @@ import { logger } from '@/lib/logger';
 
 const API_BASE = IRIS_API_URL;
 
+type IrisFeeTier = {
+  finalityThreshold: number;
+  minimumFee: number;
+};
+
+type BlockscoutTokenTransfer = {
+  from?: { hash?: string };
+  method?: string;
+  total?: { value?: string };
+  timestamp: string;
+  transaction_hash?: string;
+};
+
+function isIrisFeeTier(value: unknown): value is IrisFeeTier {
+  if (!value || typeof value !== 'object') return false;
+  const tier = value as Record<string, unknown>;
+  return (
+    typeof tier.finalityThreshold === 'number' &&
+    typeof tier.minimumFee === 'number'
+  );
+}
+
 // Blockscout API URLs for each chain
 const BLOCKSCOUT_APIS: Record<number, string> = {
   0: 'https://eth.blockscout.com',        // Ethereum
@@ -41,7 +63,7 @@ export async function getAttestation(
       throw new Error(`API error: ${response.status}`);
     }
     
-    return await response.json();
+    return (await response.json()) as IrisMessagesResponse;
   } catch (error) {
     logger.warn('Failed to get attestation:', error);
     return null;
@@ -99,15 +121,20 @@ export async function getTransferFee(
     }
     
     // API returns array: [{finalityThreshold: 1000, minimumFee: 1}, {finalityThreshold: 2000, minimumFee: 0}]
-    const data = await response.json();
+    const payload = await response.json();
+    if (!Array.isArray(payload)) {
+      logger.warn('[Iris] Unexpected fee response');
+      return null;
+    }
+    const data = payload.filter(isIrisFeeTier);
     
     // Find Fast Transfer fee (finalityThreshold <= 1000)
-    const fastFee = data.find((item: { finalityThreshold: number; minimumFee: number }) => 
+    const fastFee = data.find((item) =>
       item.finalityThreshold <= 1000
     );
     
     // Find Standard Transfer fee (finalityThreshold >= 2000)
-    const standardFee = data.find((item: { finalityThreshold: number; minimumFee: number }) => 
+    const standardFee = data.find((item) =>
       item.finalityThreshold >= 2000
     );
     
@@ -132,7 +159,7 @@ export async function getFastTransferAllowance(): Promise<IrisAllowanceResponse 
       throw new Error(`API error: ${response.status}`);
     }
     
-    return await response.json();
+    return (await response.json()) as IrisAllowanceResponse;
   } catch (error) {
     logger.warn('Failed to get fast transfer allowance:', error);
     return null;
@@ -162,7 +189,7 @@ export async function reattestMessage(
       throw new Error(`API error: ${response.status}`);
     }
     
-    return await response.json();
+    return (await response.json()) as IrisMessagesResponse;
   } catch (error) {
     logger.warn('Failed to reattest message:', error);
     return null;
@@ -186,7 +213,7 @@ export async function getMessageByNonce(
       throw new Error(`API error: ${response.status}`);
     }
     
-    return await response.json();
+    return (await response.json()) as IrisMessagesResponse;
   } catch (error) {
     logger.warn('Failed to get message by nonce:', error);
     return null;
@@ -297,8 +324,8 @@ export async function checkDestinationTransaction(
       return { completed: false };
     }
 
-    const data = await response.json();
-    const items = data.items || [];
+    const data = (await response.json()) as { items?: BlockscoutTokenTransfer[] };
+    const items = Array.isArray(data.items) ? data.items : [];
 
     // 查找匹配的 mint 交易：
     // 1. from 是 0x0（mint）

@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useEffect, useRef } from 'react';
+import { ReactNode } from 'react';
 import { createAppKit } from '@reown/appkit/react';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
 import { WagmiProvider } from 'wagmi';
@@ -24,7 +24,6 @@ import { Toaster } from '@/components/ui/sonner';
 import { solanaConfig } from '@/config/wallet';
 import { getEvmRpcUrls } from '@/config/rpc';
 import { I18nProvider } from '@/lib/i18n';
-import { useIsClient } from '@/lib/hooks/useIsClient';
 import { logger } from '@/lib/logger';
 
 // 保存原始 fetch 函数，防止浏览器扩展（如 Ambire）拦截导致 resource.clone 错误
@@ -53,6 +52,7 @@ const projectId = process.env.NEXT_PUBLIC_REOWN_PROJECT_ID || '';
 
 // Query client for React Query (单例，模块级)
 const queryClient = new QueryClient();
+let appKitInitialized = false;
 
 function withRpcUrls<T extends { id: number; rpcUrls?: unknown }>(network: T): T {
   return {
@@ -72,6 +72,34 @@ const avalancheCChain = withRpcUrls(avalanche);
 const lineaMainnet = withRpcUrls(linea);
 
 // 自定义网络配置 - AppKit 预设中没有的网络
+const codex = defineChain({
+  id: 81224,
+  caipNetworkId: 'eip155:81224',
+  chainNamespace: 'eip155',
+  name: 'Codex',
+  nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+  rpcUrls: {
+    default: { http: getEvmRpcUrls(81224) },
+  },
+  blockExplorers: {
+    default: { name: 'Codex Explorer', url: 'https://explorer.codex.xyz' },
+  },
+});
+
+const cronos = defineChain({
+  id: 25,
+  caipNetworkId: 'eip155:25',
+  chainNamespace: 'eip155',
+  name: 'Cronos',
+  nativeCurrency: { name: 'Cronos', symbol: 'CRO', decimals: 18 },
+  rpcUrls: {
+    default: { http: getEvmRpcUrls(25) },
+  },
+  blockExplorers: {
+    default: { name: 'Cronoscan', url: 'https://cronoscan.com' },
+  },
+});
+
 const unichain = defineChain({
   id: 130,
   caipNetworkId: 'eip155:130',
@@ -263,6 +291,8 @@ const evmNetworks = [
   polygonPos,
   avalancheCChain,
   lineaMainnet,
+  codex,
+  cronos,
   unichain,
   sonic,
   worldchain,
@@ -299,41 +329,42 @@ interface AppProvidersProps {
   children: ReactNode;
 }
 
+function initializeAppKit() {
+  if (appKitInitialized) return;
+
+  appKitInitialized = true;
+
+  try {
+    createAppKit({
+      adapters: [wagmiAdapter, solanaWeb3JsAdapter],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      networks: [...evmNetworks, solanaMainnet] as any,
+      projectId,
+      enableCoinbase: false,
+      metadata: {
+        name: "Captain's Bridge",
+        description: 'Cross-Chain USDC Bridge powered by Circle CCTP V2 - Zero extra fees',
+        url: 'https://bridge.abelai.app',
+        icons: ['/logos/abel-avatar.jpg'],
+      },
+      features: {
+        analytics: false,
+      },
+      themeMode: 'light',
+    });
+
+    logger.info('[AppKit] Initialized (EVM + Solana)');
+  } catch (error) {
+    appKitInitialized = false;
+    logger.warn('[AppKit] Init failed:', error);
+  }
+}
+
+// Reown hooks read a shared AppKit controller during render, so initialization
+// must happen before any descendant calls useAppKit.
+initializeAppKit();
+
 export function AppProviders({ children }: AppProvidersProps) {
-  const mounted = useIsClient();
-  const appKitInitialized = useRef(false);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (appKitInitialized.current) return;
-    
-    appKitInitialized.current = true;
-
-    try {
-      createAppKit({
-        adapters: [wagmiAdapter, solanaWeb3JsAdapter],
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        networks: [...evmNetworks, solanaMainnet] as any,
-        projectId,
-        metadata: {
-          name: "Captain's Bridge",
-          description: 'Cross-Chain USDC Bridge powered by Circle CCTP V2 - Zero extra fees',
-          url: typeof window !== 'undefined' ? window.location.origin : '',
-          icons: ['/logos/abel-avatar.jpg'],
-        },
-        features: {
-          analytics: false,
-        },
-        themeMode: 'light',
-      });
-
-      logger.info('[AppKit] Initialized (EVM + Solana)');
-    } catch (error) {
-      logger.warn('[AppKit] Init failed:', error);
-    }
-
-  }, []);
-
   return (
     <WagmiProvider config={wagmiAdapter.wagmiConfig}>
       <QueryClientProvider client={queryClient}>
@@ -344,7 +375,7 @@ export function AppProviders({ children }: AppProvidersProps) {
           disableTransitionOnChange
         >
           <I18nProvider>
-            {mounted ? children : null}
+            {children}
             <Toaster />
           </I18nProvider>
         </ThemeProvider>

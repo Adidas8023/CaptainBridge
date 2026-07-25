@@ -46,6 +46,23 @@ interface CachedBalance {
   timestamp: number;
 }
 
+type SolanaBalanceRpcResponse = {
+  error?: { message?: string };
+  result?: {
+    value?: Array<{
+      account?: {
+        data?: {
+          parsed?: {
+            info?: {
+              tokenAmount?: { amount?: string };
+            };
+          };
+        };
+      };
+    }>;
+  };
+};
+
 const balanceCache = new Map<string, CachedBalance>();
 const CACHE_TTL = 15000; // 15秒缓存有效期
 
@@ -269,7 +286,7 @@ async function fetchSolanaUsdcBalance(walletAddress: string): Promise<bigint> {
         continue;
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as SolanaBalanceRpcResponse;
 
       if (data.error) {
         lastError = new Error(data.error.message || JSON.stringify(data.error));

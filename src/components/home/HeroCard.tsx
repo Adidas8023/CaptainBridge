@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion, type Variants } from "framer-motion";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Sparkles, Shield, ExternalLink, ShieldCheck, Rocket, MessageCircle } from "lucide-react";
@@ -15,39 +15,11 @@ interface HeroCardProps {
 
 const HeroCard: React.FC<HeroCardProps> = ({ onStartTransfer }) => {
   const { t, language } = useTranslation();
-  const sparkleVariants: Variants = {
-    animate: {
-      scale: [1, 1.2, 1],
-      rotate: [0, 180, 360],
-      transition: {
-        duration: 3,
-        ease: "linear" as const,
-        repeat: Number.POSITIVE_INFINITY
-      }
-    }
-  };
-
-  const breathingVariants: Variants = {
-    animate: {
-      scale: [1, 1.05, 1],
-      opacity: [0.8, 1, 0.8],
-      transition: {
-        duration: 4,
-        ease: "easeInOut" as const,
-        repeat: Number.POSITIVE_INFINITY
-      }
-    }
-  };
-
   return (
     <Card className="h-full glass-card hover-lift group border-border/50 bg-gradient-to-br from-primary/5 via-transparent to-accent/10 relative overflow-hidden">
       {/* Gradient Background */}
       <div className="absolute inset-0 overflow-hidden">
-        <motion.div 
-          variants={breathingVariants} 
-          animate="animate"
-          className="absolute inset-0 opacity-20 bg-gradient-to-br from-primary/20 via-transparent to-chart-2/20"
-        />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-chart-2/20 opacity-20" />
       </div>
 
       {/* Content Area Overlay for Better Text Contrast */}
@@ -56,72 +28,52 @@ const HeroCard: React.FC<HeroCardProps> = ({ onStartTransfer }) => {
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10 z-10">
         <div className="absolute top-4 right-4">
-          <motion.div variants={sparkleVariants} animate="animate">
+          <div>
             <Sparkles className="h-8 w-8 text-primary" />
-          </motion.div>
+          </div>
         </div>
         <div className="absolute bottom-6 left-6">
-          <motion.div 
-            variants={sparkleVariants} 
-            animate="animate"
-            style={{ animationDelay: "1s" }}
-          >
+          <div>
             <Shield className="h-6 w-6 text-chart-2" />
-          </motion.div>
+          </div>
         </div>
       </div>
 
       <CardContent className="p-8 lg:p-12 h-full flex flex-col justify-center text-center relative z-20">
         {/* Enhanced Text Readability Backdrop */}
-        <div className="absolute inset-4 lg:inset-8 bg-background/20 backdrop-blur-sm rounded-2xl border border-primary/20"></div>
+        <div className="absolute inset-4 rounded-2xl border border-primary/20 bg-background/30 lg:inset-8"></div>
         {/* Badge */}
-        <motion.div
+        <div
           className="inline-flex items-center gap-2 px-4 py-2 mb-6 glass-card rounded-full text-sm font-medium text-primary border border-primary/30 mx-auto relative z-30"
-          initial={{ opacity: 0, scale: 0.8 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
         >
           <Sparkles className="h-4 w-4" />
           Powered by Circle CCTP Protocol
-        </motion.div>
+        </div>
 
         {/* Main Title */}
-        <motion.h1
+        <h1
           className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4 relative z-30"
           style={{ textShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          viewport={{ once: true }}
         >
           <span className="block drop-shadow-sm">{language === 'zh' ? '简单安全的' : 'Simple & Secure'}</span>
           <span className="block bg-gradient-to-r from-primary to-chart-2 bg-clip-text text-transparent drop-shadow-sm">
             {language === 'zh' ? '跨链转账' : 'Cross-Chain Transfers'}
           </span>
-        </motion.h1>
+        </h1>
 
         {/* Subtitle */}
-        <motion.p
+        <p
           className="text-base sm:text-lg text-muted-foreground mb-8 max-w-lg mx-auto leading-relaxed relative z-30"
           style={{ textShadow: '0 1px 4px rgba(0,0,0,0.1)' }}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          viewport={{ once: true }}
         >
           {language === 'zh' 
             ? '基于 Circle 官方 CCTP V2 协议的原生 USDC 跨链转账 - 快速、安全、去信任化'
             : 'Native USDC cross-chain transfers powered by Circle\'s official CCTP V2 protocol – Fast, secure, and trustless'}
-        </motion.p>
+        </p>
 
         {/* CTA Button */}
-        <motion.div
+        <div
           className="flex justify-center mb-8 relative z-30"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          viewport={{ once: true }}
         >
           <Button
             onClick={onStartTransfer}
@@ -140,41 +92,33 @@ const HeroCard: React.FC<HeroCardProps> = ({ onStartTransfer }) => {
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
             </span>
           </Button>
-        </motion.div>
+        </div>
 
         {/* Mini Stats - Enhanced with Background */}
-        <motion.div
+        <div
           className="grid grid-cols-4 gap-3 max-w-lg mx-auto relative z-30"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          viewport={{ once: true }}
         >
-          <div className="text-center p-2 rounded-lg bg-primary/10 backdrop-blur-sm border border-primary/20">
+          <div className="text-center p-2 rounded-lg bg-primary/10 border border-primary/20">
             <div className="text-lg font-bold text-primary drop-shadow-sm">{CHAINS.length}</div>
             <div className="text-xs text-primary/80 font-medium">{language === 'zh' ? '条链' : 'Chains'}</div>
           </div>
-          <div className="text-center p-2 rounded-lg bg-chart-2/10 backdrop-blur-sm border border-chart-2/20">
+          <div className="text-center p-2 rounded-lg bg-chart-2/10 border border-chart-2/20">
             <div className="text-lg font-bold text-chart-2 drop-shadow-sm">~13m</div>
             <div className="text-xs text-chart-2/80 font-medium">{language === 'zh' ? '标准' : 'Standard'}</div>
           </div>
-          <div className="text-center p-2 rounded-lg bg-chart-1/10 backdrop-blur-sm border border-chart-1/20">
+          <div className="text-center p-2 rounded-lg bg-chart-1/10 border border-chart-1/20">
             <div className="text-lg font-bold text-chart-1 drop-shadow-sm">~30s</div>
             <div className="text-xs text-chart-1/80 font-medium">{language === 'zh' ? '快速' : 'Fast'}</div>
           </div>
-          <div className="text-center p-2 rounded-lg bg-primary/10 backdrop-blur-sm border border-primary/20">
+          <div className="text-center p-2 rounded-lg bg-primary/10 border border-primary/20">
             <div className="text-lg font-bold text-primary drop-shadow-sm">V2</div>
             <div className="text-xs text-primary/80 font-medium">CCTP</div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Author Info */}
-        <motion.div
+        <div
           className="mt-8 pt-6 border-t border-primary/20 relative z-30"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          viewport={{ once: true }}
         >
           <p className="text-xs text-muted-foreground mb-3">{language === 'zh' ? '用 ❤️ 打造' : 'Built with ❤️ by'}</p>
           <a 
@@ -247,7 +191,7 @@ const HeroCard: React.FC<HeroCardProps> = ({ onStartTransfer }) => {
               </p>
             </motion.div>
           </div>
-        </motion.div>
+        </div>
       </CardContent>
     </Card>
   );

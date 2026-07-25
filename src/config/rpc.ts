@@ -29,6 +29,11 @@ export const EVM_RPC_CONFIG: Record<number, EvmRpcConfig> = {
     fallbacks: ['https://optimism-rpc.publicnode.com'],
     alchemyNetwork: 'opt-mainnet',
   },
+  25: {
+    envKey: 'NEXT_PUBLIC_CRONOS_RPC_URL',
+    defaultUrl: 'https://evm.cronos.org',
+    fallbacks: ['https://cronos-evm-rpc.publicnode.com'],
+  },
   50: {
     envKey: 'NEXT_PUBLIC_XDC_RPC_URL',
     defaultUrl: 'https://erpc.xdcrpc.com',
@@ -120,6 +125,7 @@ export const EVM_RPC_CONFIG: Record<number, EvmRpcConfig> = {
 
 export const RPC_DEFAULTS = {
   ethereum: getDefaultEvmRpcUrl(1),
+  cronos: getDefaultEvmRpcUrl(25),
   avalanche: getDefaultEvmRpcUrl(43114),
   optimism: getDefaultEvmRpcUrl(10),
   arbitrum: getDefaultEvmRpcUrl(42161),

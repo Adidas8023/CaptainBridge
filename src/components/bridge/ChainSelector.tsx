@@ -21,31 +21,6 @@ import type { Chain } from '@/types';
 import { CHAINS } from '@/lib/cctp/constants';
 import { useTranslation } from '@/lib/i18n';
 
-// 当前 AppKit/Wagmi 已配置支持的链，防止选择未配置导致无法连接/读余额
-const SUPPORTED_CHAIN_IDS = new Set([
-  'ethereum',
-  'arbitrum',
-  'optimism',
-  'base',
-  'polygon',
-  'avalanche',
-  'linea',
-  'solana',
-  'unichain',
-  'sonic',
-  'worldchain',
-  'monad',
-  'sei',
-  'xdc',
-  'hyperevm',
-  'ink',
-  'plume',
-  'edge',
-  'injective',
-  'morph',
-  'pharos',
-]);
-
 interface ChainSelectorProps {
   label: string;
   selectedChain: Chain | null;
@@ -64,9 +39,7 @@ export function ChainSelector({
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
-  const availableChains = CHAINS.filter(
-    (chain) => chain.id !== excludeChain?.id && SUPPORTED_CHAIN_IDS.has(chain.id)
-  );
+  const availableChains = CHAINS.filter((chain) => chain.id !== excludeChain?.id);
 
   return (
     <div className="flex flex-col gap-2">
@@ -158,7 +131,7 @@ function ChainIcon({ chain }: { chain: Chain }) {
         width={32}
         height={32}
         unoptimized
-        className="w-full h-full object-cover"
+        className="w-full h-full object-contain"
         onError={() => setHasError(true)}
       />
     </div>

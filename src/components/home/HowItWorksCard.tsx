@@ -56,37 +56,14 @@ const HowItWorksCard: React.FC = () => {
     return () => clearInterval(interval);
   }, [isAnimating, steps.length]);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  const stepVariants = {
-    hidden: { opacity: 0, x: -20 },
-    visible: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: 20 },
-  };
-
   return (
     <Card className="h-full glass-card hover-lift group border-border/50 bg-card/50 relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-4 right-4">
-          <motion.div
-            animate={{ rotate: isAnimating ? [0, 360] : 0 }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          >
+          <div>
             <Coins className="h-12 w-12 text-primary" />
-          </motion.div>
+          </div>
         </div>
       </div>
 
@@ -113,12 +90,7 @@ const HowItWorksCard: React.FC = () => {
 
       <CardContent className="space-y-6">
         {/* Steps Flow */}
-        <motion.div
-          className="space-y-4"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
+        <div className="space-y-4">
           {steps.map((step, index) => {
             const Icon = step.icon;
             const isActive = currentStep === index;
@@ -132,7 +104,6 @@ const HowItWorksCard: React.FC = () => {
                     ? `${step.bgColor} border border-current/20 shadow-lg`
                     : 'hover:bg-muted/10'
                 }`}
-                variants={stepVariants}
                 whileHover={{ scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
               >
@@ -142,13 +113,8 @@ const HowItWorksCard: React.FC = () => {
                     className={`p-2 rounded-lg ${
                       isActive || isCompleted ? step.bgColor : 'bg-muted/20'
                     }`}
-                    animate={{
-                      scale: isActive ? [1, 1.1, 1] : 1,
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: isActive ? Infinity : 0,
-                    }}
+                    animate={{ scale: isActive ? 1.05 : 1 }}
+                    transition={{ duration: 0.2 }}
                   >
                     <Icon
                       className={`h-5 w-5 ${
@@ -161,13 +127,9 @@ const HowItWorksCard: React.FC = () => {
                   {isActive && (
                     <motion.div
                       className="absolute inset-0 rounded-lg border-2 border-current/30"
-                      initial={{ scale: 1, opacity: 1 }}
-                      animate={{ scale: 1.3, opacity: 0 }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: "easeOut",
-                      }}
+                      initial={{ scale: 0.95, opacity: 0 }}
+                      animate={{ scale: 1.1, opacity: 0.35 }}
+                      transition={{ duration: 0.25 }}
                     />
                   )}
                 </div>
@@ -220,7 +182,7 @@ const HowItWorksCard: React.FC = () => {
               </motion.div>
             );
           })}
-        </motion.div>
+        </div>
 
         {/* Progress Indicator */}
         <div className="flex justify-center gap-1.5 pt-2">
@@ -240,16 +202,13 @@ const HowItWorksCard: React.FC = () => {
         </div>
 
         {/* Bottom Info */}
-        <motion.div
+        <div
           className="text-center pt-2 border-t border-border/20"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
         >
           <p className="text-xs text-muted-foreground">
             Powered by Circle CCTP V2 Protocol
           </p>
-        </motion.div>
+        </div>
       </CardContent>
     </Card>
   );
