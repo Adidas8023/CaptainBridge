@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
 import { translations, Language, TranslationKeys } from './translations';
 import { useIsClient } from '@/lib/hooks/useIsClient';
 
@@ -18,6 +18,11 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(() => {
     if (typeof window === 'undefined') return 'en';
 
+    const queryLanguage = new URLSearchParams(window.location.search).get('lang');
+    if (queryLanguage === 'en' || queryLanguage === 'zh') {
+      return queryLanguage;
+    }
+
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored && (stored === 'en' || stored === 'zh')) {
       return stored;
@@ -34,6 +39,10 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(STORAGE_KEY, lang);
     }
   }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en';
+  }, [language]);
 
   const t = translations[language];
 

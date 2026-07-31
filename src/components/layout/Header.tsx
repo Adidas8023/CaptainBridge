@@ -59,6 +59,12 @@ export function Header() {
           <NavLink href="/history" active={pathname === '/history'}>
             {t.header.history}
           </NavLink>
+          <a
+            href={`${language === 'zh' ? 'https://abelai.app/projects' : 'https://abelai.app/en/projects'}?utm_source=bridge.abelai.app&utm_medium=navigation&utm_campaign=product-ecosystem`}
+            className="px-3 sm:px-4 py-2 text-sm font-medium rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+          >
+            {t.header.ecosystem}
+          </a>
         </nav>
       </div>
 
@@ -114,6 +120,13 @@ export function Header() {
             >
               {t.header.history}
             </MobileNavLink>
+            <a
+              href={`${language === 'zh' ? 'https://abelai.app/projects' : 'https://abelai.app/en/projects'}?utm_source=bridge.abelai.app&utm_medium=navigation&utm_campaign=product-ecosystem`}
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-4 py-3 text-base font-medium rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+            >
+              {t.header.ecosystem}
+            </a>
           </nav>
           <div className="flex items-center justify-center gap-4 pt-3 border-t border-border/50">
             <LanguageToggle />

@@ -1,14 +1,21 @@
 'use client';
 
 import { Languages } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/lib/i18n';
 
 export function LanguageToggle() {
   const { language, setLanguage } = useTranslation();
+  const pathname = usePathname();
+  const router = useRouter();
 
   const toggleLanguage = () => {
-    setLanguage(language === 'en' ? 'zh' : 'en');
+    const nextLanguage = language === 'en' ? 'zh' : 'en';
+    const nextSearchParams = new URLSearchParams(window.location.search);
+    nextSearchParams.set('lang', nextLanguage);
+    setLanguage(nextLanguage);
+    router.replace(`${pathname}?${nextSearchParams.toString()}`, { scroll: false });
   };
 
   return (

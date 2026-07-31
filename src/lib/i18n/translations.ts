@@ -5,6 +5,7 @@ export const translations = {
       home: 'Home',
       bridge: 'Bridge',
       history: 'History',
+      ecosystem: 'AbelAI Projects',
     },
     // Wallet
     wallet: {
@@ -263,6 +264,7 @@ export const translations = {
       home: '首页',
       bridge: '跨链桥',
       history: '历史记录',
+      ecosystem: 'AbelAI 项目',
     },
     // Wallet
     wallet: {
