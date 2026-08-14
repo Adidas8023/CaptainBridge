@@ -382,6 +382,22 @@ export const CHAINS: Chain[] = [
     supportsFastTransfer: false,
     color: '#4CDBFF',
   },
+  {
+    id: 'xlayer',
+    name: 'X Layer',
+    domainId: 37,
+    type: 'evm',
+    chainId: 196,
+    icon: '/logos/x-layer.svg',
+    rpcUrl: getRpcUrl('NEXT_PUBLIC_XLAYER_RPC_URL', DEFAULT_RPC.xlayer),
+    explorerUrl: 'https://www.oklink.com/xlayer',
+    usdcAddress: '0xB6CEceAB302E2E4948951eE7843FC24E92933061',
+    tokenMessengerAddress: '0x28b5a0e9C621a5BadaA536219b3a228C8168cf5d',
+    messageTransmitterAddress: '0x81D40F21F12A8F0E3252Bccb954D722d4c464B64',
+    fastTransferFee: 1.4,
+    supportsFastTransfer: true,
+    color: '#111111',
+  },
 ];
 
 // Helper functions

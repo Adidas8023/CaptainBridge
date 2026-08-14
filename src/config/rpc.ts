@@ -57,6 +57,10 @@ export const EVM_RPC_CONFIG: Record<number, EvmRpcConfig> = {
     envKey: 'NEXT_PUBLIC_SONIC_RPC_URL',
     defaultUrl: 'https://rpc.soniclabs.com',
   },
+  196: {
+    envKey: 'NEXT_PUBLIC_XLAYER_RPC_URL',
+    defaultUrl: 'https://xlayerrpc.okx.com',
+  },
   480: {
     envKey: 'NEXT_PUBLIC_WORLDCHAIN_RPC_URL',
     defaultUrl: 'https://worldchain-mainnet.g.alchemy.com/public',
@@ -147,6 +151,7 @@ export const RPC_DEFAULTS = {
   injective: getDefaultEvmRpcUrl(1776),
   morph: getDefaultEvmRpcUrl(2818),
   pharos: getDefaultEvmRpcUrl(1672),
+  xlayer: getDefaultEvmRpcUrl(196),
 };
 
 export function getEvmRpcUrls(chainId: number, primaryRpcUrl?: string): string[] {

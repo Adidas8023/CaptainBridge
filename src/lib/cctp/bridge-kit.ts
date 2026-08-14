@@ -39,7 +39,8 @@ type BridgeKitChain =
   | 'Injective'
   | 'Morph'
   | 'Pharos'
-  | 'Cronos';
+  | 'Cronos'
+  | 'X_Layer';
 
 type TransferSpeed = 'FAST' | 'SLOW';
 
@@ -87,10 +88,11 @@ const BRIDGE_CHAIN_BY_DOMAIN: Record<number, BridgeKitChain> = {
   30: 'Morph',
   31: 'Pharos',
   32: 'Cronos',
+  37: 'X_Layer',
 };
 
 // Circle CCTP v2 fast-transfer source support. Starknet intentionally omitted.
-const FAST_TRANSFER_SOURCE_DOMAINS = new Set([0, 2, 3, 5, 6, 10, 11, 12, 14, 21, 22, 28, 30]);
+const FAST_TRANSFER_SOURCE_DOMAINS = new Set([0, 2, 3, 5, 6, 10, 11, 12, 14, 21, 22, 28, 30, 37]);
 
 const EVM_TX_HASH_RE = /0x[a-fA-F0-9]{64}/;
 const SOLANA_SIGNATURE_RE = /[1-9A-HJ-NP-Za-km-z]{64,100}/;

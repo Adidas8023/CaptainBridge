@@ -282,6 +282,20 @@ const pharos = defineChain({
   },
 });
 
+const xlayer = defineChain({
+  id: 196,
+  caipNetworkId: 'eip155:196',
+  chainNamespace: 'eip155',
+  name: 'X Layer',
+  nativeCurrency: { name: 'OKB', symbol: 'OKB', decimals: 18 },
+  rpcUrls: {
+    default: { http: getEvmRpcUrls(196) },
+  },
+  blockExplorers: {
+    default: { name: 'OKLink X Layer Explorer', url: 'https://www.oklink.com/xlayer' },
+  },
+});
+
 // 所有 EVM 网络
 const evmNetworks = [
   ethereum,
@@ -306,6 +320,7 @@ const evmNetworks = [
   injective,
   morph,
   pharos,
+  xlayer,
 ];
 
 // Wagmi Adapter - EVM链配置
@@ -340,6 +355,9 @@ function initializeAppKit() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       networks: [...evmNetworks, solanaMainnet] as any,
       projectId,
+      chainImages: {
+        196: '/logos/x-layer.svg',
+      },
       enableCoinbase: false,
       metadata: {
         name: "Captain's Bridge",

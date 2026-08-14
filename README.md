@@ -69,11 +69,11 @@ CaptainBridge 是一个基于 **Next.js 16**、**Circle CCTP v2**、**Reown AppK
 
 ### 支持网络
 
-当前配置共 **23** 条主网：
+当前配置共 **24** 条主网：
 
 | EVM | Solana |
 | --- | --- |
-| Ethereum, Avalanche, OP Mainnet, Arbitrum One, Base, Polygon, Unichain, Linea Mainnet, Codex, Cronos, Sonic, World Chain, Monad, Sei Network, XDC Network, HyperEVM, Ink, Plume, Edge, Injective, Morph, Pharos | Solana |
+| Ethereum, Avalanche, OP Mainnet, Arbitrum One, Base, Polygon, Unichain, Linea Mainnet, Codex, Cronos, Sonic, World Chain, Monad, Sei Network, XDC Network, HyperEVM, Ink, Plume, Edge, Injective, Morph, Pharos, X Layer | Solana |
 
 > Starknet 当前不在范围内。
 
@@ -211,11 +211,11 @@ The app is non-custodial. It does not store private keys. Wallet connection, sig
 
 ### Supported Networks
 
-The current mainnet registry includes **23** networks:
+The current mainnet registry includes **24** networks:
 
 | EVM | Solana |
 | --- | --- |
-| Ethereum, Avalanche, OP Mainnet, Arbitrum One, Base, Polygon, Unichain, Linea Mainnet, Codex, Cronos, Sonic, World Chain, Monad, Sei Network, XDC Network, HyperEVM, Ink, Plume, Edge, Injective, Morph, Pharos | Solana |
+| Ethereum, Avalanche, OP Mainnet, Arbitrum One, Base, Polygon, Unichain, Linea Mainnet, Codex, Cronos, Sonic, World Chain, Monad, Sei Network, XDC Network, HyperEVM, Ink, Plume, Edge, Injective, Morph, Pharos, X Layer | Solana |
 
 > Starknet is intentionally out of scope for now.
 
