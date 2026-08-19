@@ -10,6 +10,7 @@ import { LanguageToggle } from './LanguageToggle';
 import { WalletConnector } from '@/components/wallet/WalletConnector';
 import { useTranslation } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
+import { EcosystemMenu } from './EcosystemMenu';
 
 export function Header() {
   const pathname = usePathname();
@@ -59,12 +60,7 @@ export function Header() {
           <NavLink href="/history" active={pathname === '/history'}>
             {t.header.history}
           </NavLink>
-          <a
-            href={`${language === 'zh' ? 'https://abelai.app/projects' : 'https://abelai.app/en/projects'}?utm_source=bridge.abelai.app&utm_medium=navigation&utm_campaign=product-ecosystem`}
-            className="px-3 sm:px-4 py-2 text-sm font-medium rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-          >
-            {t.header.ecosystem}
-          </a>
+          <EcosystemMenu language={language} />
         </nav>
       </div>
 
@@ -84,6 +80,11 @@ export function Header() {
             variant="ghost"
             size="icon"
             className="h-8 w-8"
+            aria-label={mobileMenuOpen
+              ? (language === 'zh' ? '关闭菜单' : 'Close menu')
+              : (language === 'zh' ? '打开菜单' : 'Open menu')}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-navigation"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? (
@@ -97,7 +98,7 @@ export function Header() {
 
       {/* 移动端下拉菜单 */}
       {mobileMenuOpen && (
-        <div className="absolute top-14 left-0 right-0 bg-background/95 backdrop-blur-md border-b border-border/50 p-4 sm:hidden animate-in slide-in-from-top-2 duration-200">
+        <div id="mobile-navigation" className="absolute top-14 left-0 right-0 bg-background/95 backdrop-blur-md border-b border-border/50 p-4 sm:hidden animate-in slide-in-from-top-2 duration-200">
           <nav className="flex flex-col gap-2 mb-4">
             <MobileNavLink 
               href="/" 
@@ -120,13 +121,7 @@ export function Header() {
             >
               {t.header.history}
             </MobileNavLink>
-            <a
-              href={`${language === 'zh' ? 'https://abelai.app/projects' : 'https://abelai.app/en/projects'}?utm_source=bridge.abelai.app&utm_medium=navigation&utm_campaign=product-ecosystem`}
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-4 py-3 text-base font-medium rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-            >
-              {t.header.ecosystem}
-            </a>
+            <EcosystemMenu language={language} mobile onNavigate={() => setMobileMenuOpen(false)} />
           </nav>
           <div className="flex items-center justify-center gap-4 pt-3 border-t border-border/50">
             <LanguageToggle />
