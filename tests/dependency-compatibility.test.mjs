@@ -1,8 +1,31 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createRequire } from 'node:module';
+import { readFileSync } from 'node:fs';
+import { posix } from 'node:path';
 
 const rootRequire = createRequire(import.meta.url);
+
+// Load the real TypeScript configuration with its aliases, without a browser,
+// wallet, RPC requests, or an extra runtime dependency in the application.
+const sourceModules = new Map();
+function loadSource(path) {
+  if (sourceModules.has(path)) return sourceModules.get(path).exports;
+  const sourceModule = { exports: {} };
+  sourceModules.set(path, sourceModule);
+  const ts = rootRequire('typescript');
+  const source = readFileSync(new URL(`../src/${path}.ts`, import.meta.url), 'utf8');
+  const { outputText } = ts.transpileModule(source, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+  });
+  const require = id => id.startsWith('@/')
+    ? loadSource(id.slice(2))
+    : id.startsWith('.')
+      ? loadSource(posix.normalize(posix.join(posix.dirname(path), id)))
+      : rootRequire(id);
+  new Function('require', 'module', 'exports', outputText)(require, sourceModule, sourceModule.exports);
+  return sourceModule.exports;
+}
 
 const web3Require = createRequire(rootRequire.resolve('@solana/web3.js'));
 const Client = web3Require('jayson/lib/client/browser');
@@ -57,4 +80,32 @@ test('Anchor workspace TOML keeps Buffer input, program addresses and provider c
   assert.equal(Object.getPrototypeOf(config.provider), null);
   assert.equal(Object.entries(config.programs.localnet).find(([name]) => name === 'bridge')[1], '11111111111111111111111111111111');
   assert.deepEqual(config.workspace.members, ['programs/*']);
+});
+
+test('upgraded Circle SDK preserves every configured mainnet USDC route and contract', async context => {
+  // The new SDK warms its CCTPx registries in the background. Route metadata
+  // comes from its bundled catalog, so this test needs no external service.
+  context.mock.method(globalThis, 'fetch', async () => {
+    throw new Error('External requests are disabled in dependency compatibility tests');
+  });
+  const { CHAINS } = loadSource('lib/cctp/constants');
+  const { createBridgeKit, toBridgeKitChain } = loadSource('lib/cctp/bridge-kit');
+  const kit = await createBridgeKit();
+  const catalog = kit.getSupportedChains({ isTestnet: false });
+  assert.equal(CHAINS.length, 24);
+  assert.equal(new Set(CHAINS.map(chain => chain.domainId)).size, CHAINS.length);
+  for (const chain of CHAINS) {
+    const sdk = catalog.find(entry => entry.chain === toBridgeKitChain(chain));
+    assert.ok(sdk, `${chain.name} is absent from the upgraded SDK`);
+    assert.equal(sdk.cctp.domain, chain.domainId, chain.name);
+    assert.equal(sdk.chainId, chain.chainId, chain.name);
+    assert.equal(sdk.type, chain.type, chain.name);
+    const normalizeAddress = address => chain.type === 'evm' ? address.toLowerCase() : address;
+    assert.equal(normalizeAddress(sdk.usdcAddress), normalizeAddress(chain.usdcAddress), chain.name);
+    assert.equal(normalizeAddress(sdk.cctp.contracts.v2.tokenMessenger), normalizeAddress(chain.tokenMessengerAddress), chain.name);
+    assert.equal(normalizeAddress(sdk.cctp.contracts.v2.messageTransmitter), normalizeAddress(chain.messageTransmitterAddress), chain.name);
+  }
+  assert.equal(CHAINS.some(chain => chain.domainId === 25), false, 'Starknet stays excluded');
+  const configuredDomains = new Set(CHAINS.map(chain => chain.domainId));
+  assert.deepEqual(catalog.filter(chain => !configuredDomains.has(chain.cctp.domain)).map(chain => chain.chain).sort(), ['Arc', 'Plasma']);
 });
