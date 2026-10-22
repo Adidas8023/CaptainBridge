@@ -29,6 +29,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+      - name: Verify dependency compatibility
+        run: npm run test:dependencies
+
       - name: Lint
         run: npm run lint
       - name: Typecheck

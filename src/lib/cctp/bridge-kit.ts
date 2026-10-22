@@ -99,7 +99,7 @@ const SOLANA_SIGNATURE_RE = /[1-9A-HJ-NP-Za-km-z]{64,100}/;
 
 export async function createBridgeKit() {
   const { BridgeKit } = await import('@circle-fin/bridge-kit');
-  return new BridgeKit();
+  return new BridgeKit({ disableAnalytics: true });
 }
 
 export function toBridgeKitChain(chain: Chain): BridgeKitChain {
