@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
 import { translations, Language, TranslationKeys } from './translations';
 import { useIsClient } from '@/lib/hooks/useIsClient';
+import { usePathname } from 'next/navigation';
 
 interface I18nContextType {
   language: Language;
@@ -14,16 +15,20 @@ const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'cctp-language';
 
-export function I18nProvider({ children }: { children: ReactNode }) {
+export function I18nProvider({ children, initialLanguage = 'en' }: { children: ReactNode; initialLanguage?: Language }) {
+  const pathname = usePathname();
+  const routeLanguage = pathname === '/zh' ? 'zh' : pathname === '/en' || pathname === '/' ? 'en' : null;
   const [language, setLanguageState] = useState<Language>(() => {
-    if (typeof window === 'undefined') return 'en';
+    if (routeLanguage) return routeLanguage;
+    if (typeof window === 'undefined') return initialLanguage;
 
     const queryLanguage = new URLSearchParams(window.location.search).get('lang');
     if (queryLanguage === 'en' || queryLanguage === 'zh') {
       return queryLanguage;
     }
 
-    const stored = localStorage.getItem(STORAGE_KEY);
+    let stored: string | null = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch { /* Storage can be disabled. */ }
     if (stored && (stored === 'en' || stored === 'zh')) {
       return stored;
     }
@@ -36,27 +41,29 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const setLanguage = useCallback((lang: Language) => {
     setLanguageState(lang);
     if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, lang);
+      try { localStorage.setItem(STORAGE_KEY, lang); } catch { /* Storage can be disabled. */ }
     }
   }, []);
 
-  useEffect(() => {
-    document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en';
-  }, [language]);
+  const activeLanguage = routeLanguage ?? language;
 
-  const t = translations[language];
+  useEffect(() => {
+    document.documentElement.lang = activeLanguage === 'zh' ? 'zh-CN' : 'en';
+  }, [activeLanguage]);
+
+  const t = translations[activeLanguage];
 
   // 避免 hydration mismatch
   if (!mounted) {
     return (
-      <I18nContext.Provider value={{ language: 'en', setLanguage, t: translations.en }}>
+      <I18nContext.Provider value={{ language: initialLanguage, setLanguage, t: translations[initialLanguage] }}>
         {children}
       </I18nContext.Provider>
     );
   }
 
   return (
-    <I18nContext.Provider value={{ language, setLanguage, t }}>
+    <I18nContext.Provider value={{ language: activeLanguage, setLanguage, t }}>
       {children}
     </I18nContext.Provider>
   );

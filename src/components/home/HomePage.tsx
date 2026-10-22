@@ -8,11 +8,12 @@ import { Header } from '@/components/layout/Header';
 import { BlackholeBackground } from '@/components/layout/BlackholeBackground';
 import BentoGrid from '@/components/home/BentoGrid';
 import { useTranslation } from '@/lib/i18n';
+import type { DisplayChain } from './types';
 
-export default function Home() {
+export default function Home({ chains }: { chains: DisplayChain[] }) {
   const { theme } = useTheme();
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const toggleFaq = useCallback((index: number) => {
@@ -20,8 +21,8 @@ export default function Home() {
   }, []);
 
   const handleStartTransfer = useCallback(() => {
-    router.push('/bridge');
-  }, [router]);
+    router.push(`/bridge?lang=${language}`);
+  }, [router, language]);
 
   return (
     <main
@@ -37,7 +38,7 @@ export default function Home() {
       {/* Main Content */}
       <div className="relative z-10 pt-20">
         <div className="py-8">
-          <BentoGrid onStartTransfer={handleStartTransfer} />
+          <BentoGrid onStartTransfer={handleStartTransfer} chains={chains} />
 
           {/* FAQ Section */}
           <div className="max-w-2xl mx-auto mt-12 px-4">
@@ -49,6 +50,8 @@ export default function Home() {
               <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden">
                 <button
                   onClick={() => toggleFaq(1)}
+                  aria-expanded={openFaq === 1}
+                  aria-controls="faq-answer-1"
                   className="w-full flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-muted/30 transition-colors"
                 >
                   <span className="text-sm font-medium text-foreground text-left">{t.faq.q1}</span>
@@ -56,17 +59,17 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
-                {openFaq === 1 && (
-                  <div className="px-4 pb-3 text-sm text-muted-foreground">
+                <div id="faq-answer-1" hidden={openFaq !== 1} className="px-4 pb-3 text-sm text-muted-foreground">
                     {t.faq.a1}
                   </div>
-                )}
               </div>
 
               {/* Q2: 安全提示 */}
               <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden">
                 <button
                   onClick={() => toggleFaq(2)}
+                  aria-expanded={openFaq === 2}
+                  aria-controls="faq-answer-2"
                   className="w-full flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-muted/30 transition-colors"
                 >
                   <span className="text-sm font-medium text-foreground text-left">{t.faq.q2}</span>
@@ -74,8 +77,7 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
-                {openFaq === 2 && (
-                  <div className="px-4 pb-3 text-sm text-muted-foreground">
+                <div id="faq-answer-2" hidden={openFaq !== 2} className="px-4 pb-3 text-sm text-muted-foreground">
                     {t.faq.a2}{' '}
                     <a
                       href="https://developers.circle.com/stablecoins/evm-smart-contracts"
@@ -87,13 +89,14 @@ export default function Home() {
                     </a>
                     {' '}{t.faq.a2After}
                   </div>
-                )}
               </div>
 
               {/* Q3: 支持的链 */}
               <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden">
                 <button
                   onClick={() => toggleFaq(3)}
+                  aria-expanded={openFaq === 3}
+                  aria-controls="faq-answer-3"
                   className="w-full flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-muted/30 transition-colors"
                 >
                   <span className="text-sm font-medium text-foreground text-left">{t.faq.q3}</span>
@@ -101,17 +104,17 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
-                {openFaq === 3 && (
-                  <div className="px-4 pb-3 text-sm text-muted-foreground">
+                <div id="faq-answer-3" hidden={openFaq !== 3} className="px-4 pb-3 text-sm text-muted-foreground">
                     {t.faq.a3}
                   </div>
-                )}
               </div>
 
               {/* Q4: 开源共建 */}
               <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden">
                 <button
                   onClick={() => toggleFaq(4)}
+                  aria-expanded={openFaq === 4}
+                  aria-controls="faq-answer-4"
                   className="w-full flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-muted/30 transition-colors"
                 >
                   <span className="text-sm font-medium text-foreground text-left">{t.faq.q4}</span>
@@ -119,17 +122,17 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
-                {openFaq === 4 && (
-                  <div className="px-4 pb-3 text-sm text-muted-foreground">
+                <div id="faq-answer-4" hidden={openFaq !== 4} className="px-4 pb-3 text-sm text-muted-foreground">
                     {t.faq.a4}
                   </div>
-                )}
               </div>
 
               {/* Q5: 免责声明 */}
               <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden">
                 <button
                   onClick={() => toggleFaq(5)}
+                  aria-expanded={openFaq === 5}
+                  aria-controls="faq-answer-5"
                   className="w-full flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-muted/30 transition-colors"
                 >
                   <span className="text-sm font-medium text-foreground text-left">{t.faq.q5}</span>
@@ -137,14 +140,19 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
-                {openFaq === 5 && (
-                  <div className="px-4 pb-3 text-sm text-muted-foreground">
+                <div id="faq-answer-5" hidden={openFaq !== 5} className="px-4 pb-3 text-sm text-muted-foreground">
                     {t.faq.a5}
                   </div>
-                )}
               </div>
             </div>
           </div>
+
+          <nav aria-label={language === 'zh' ? '作者与其他产品' : 'Author and products'} className="mt-8 flex flex-wrap justify-center gap-4 text-xs text-muted-foreground">
+            <a href={language === 'zh' ? 'https://abelai.app' : 'https://abelai.app/en'} className="hover:underline">Abel</a>
+            <a href={`https://promptvault.abelai.app/${language}`} className="hover:underline">PromptVault</a>
+            <a href={language === 'zh' ? 'https://ucard.abelai.app' : 'https://ucard.abelai.app/en'} className="hover:underline">{language === 'zh' ? '优卡指南' : 'UCard Guide'}</a>
+            <a href={language === 'zh' ? '/en' : '/zh'} hrefLang={language === 'zh' ? 'en' : 'zh-CN'} className="hover:underline">{language === 'zh' ? 'English' : '中文'}</a>
+          </nav>
 
           {/* Footer Info */}
           <div className="mt-8 text-center pb-8">
