@@ -24,6 +24,14 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  async redirects() {
+    return ['en', 'zh'].map((language) => ({
+      source: '/',
+      has: [{ type: 'query' as const, key: 'lang', value: language }],
+      destination: `/${language}`,
+      permanent: false,
+    }));
+  },
   async headers() {
     return [
       {

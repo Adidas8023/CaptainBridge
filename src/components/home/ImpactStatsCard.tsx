@@ -5,9 +5,8 @@ import { motion, Variants } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Layers, Clock, Zap, Shield, TrendingUp } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
-import { CHAINS } from "@/lib/cctp/constants";
 
-const ImpactStatsCard: React.FC = () => {
+const ImpactStatsCard: React.FC<{ chainCount: number }> = ({ chainCount }) => {
   const { t } = useTranslation();
   const breathingVariants: Variants = {
     animate: {
@@ -62,7 +61,7 @@ const ImpactStatsCard: React.FC = () => {
                 transition={{ type: "spring", stiffness: 500, damping: 15, delay: 0.4 }}
                 viewport={{ once: true }}
               >
-                {CHAINS.length}
+                {chainCount}
               </motion.span>
               <span className="text-sm text-muted-foreground block">{t.stats.supportedChains}</span>
             </div>
