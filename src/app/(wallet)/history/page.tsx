@@ -2,6 +2,7 @@
 
 import { useTheme } from 'next-themes';
 import { Header } from '@/components/layout/Header';
+import { WalletConnector } from '@/components/wallet/WalletConnector';
 import { ChevronBackground } from '@/components/layout/ChevronBackground';
 import { TransactionHistory } from '@/components/bridge/TransactionHistory';
 
@@ -18,7 +19,7 @@ export default function HistoryPage() {
       <ChevronBackground />
 
       {/* Header */}
-      <Header />
+      <Header wallet={<WalletConnector />} />
 
       {/* Main Content */}
       <div className="container mx-auto px-4 pt-24 pb-12">

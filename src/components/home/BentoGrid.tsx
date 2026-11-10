@@ -16,8 +16,11 @@ interface BentoGridProps {
 }
 
 const BentoGrid: React.FC<BentoGridProps> = ({ onStartTransfer, chains }) => {
+  // The grid and hero card stay opaque in their initial (server-rendered) state:
+  // the hero text is the LCP element, and fading it in from opacity 0 delayed LCP
+  // until hydration finished. They still slide/scale in; other cards still fade.
   const containerVariants: Variants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 1 },
     visible: {
       opacity: 1,
       transition: {
@@ -40,6 +43,11 @@ const BentoGrid: React.FC<BentoGridProps> = ({ onStartTransfer, chains }) => {
     }
   };
 
+  const heroVariants: Variants = {
+    hidden: { y: 24 },
+    visible: { y: 0, transition: { duration: 0.6, ease: "easeOut" as const } },
+  };
+
   return (
     <section className="pb-4 pt-1 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
@@ -56,7 +64,7 @@ const BentoGrid: React.FC<BentoGridProps> = ({ onStartTransfer, chains }) => {
         >
           {/* Hero Card - Large central piece */}
           <motion.div
-            variants={itemVariants}
+            variants={heroVariants}
             className="md:col-span-3 lg:col-span-4 md:row-span-2 order-1"
             style={{ minHeight: '400px' }}
           >

@@ -90,8 +90,8 @@ const HeroCard: React.FC<HeroCardProps> = ({ onStartTransfer, chainCount }) => {
         <motion.h1
           className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4 relative z-30"
           style={{ textShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ y: 20 }}
+          whileInView={{ y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
           viewport={{ once: true }}
         >
@@ -105,8 +105,8 @@ const HeroCard: React.FC<HeroCardProps> = ({ onStartTransfer, chainCount }) => {
         <motion.p
           className="text-base sm:text-lg text-muted-foreground mb-8 max-w-lg mx-auto leading-relaxed relative z-30"
           style={{ textShadow: '0 1px 4px rgba(0,0,0,0.1)' }}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ y: 20 }}
+          whileInView={{ y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           viewport={{ once: true }}
         >

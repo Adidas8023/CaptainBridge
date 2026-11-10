@@ -19,11 +19,8 @@ import {
 import { defineChain } from '@reown/appkit/networks';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
-import { ThemeProvider } from 'next-themes';
-import { Toaster } from '@/components/ui/sonner';
 import { solanaConfig } from '@/config/wallet';
 import { getEvmRpcUrls } from '@/config/rpc';
-import { I18nProvider, type Language } from '@/lib/i18n';
 import { logger } from '@/lib/logger';
 
 // 保存原始 fetch 函数，防止浏览器扩展（如 Ambire）拦截导致 resource.clone 错误
@@ -340,10 +337,6 @@ const solanaMainnet = {
   rpcUrl: solanaConfig.mainnet.rpcUrl,
 };
 
-interface AppProvidersProps {
-  children: ReactNode;
-  initialLanguage: Language;
-}
 
 function initializeAppKit() {
   if (appKitInitialized) return;
@@ -383,22 +376,12 @@ function initializeAppKit() {
 // must happen before any descendant calls useAppKit.
 initializeAppKit();
 
-export function AppProviders({ children, initialLanguage }: AppProvidersProps) {
+// Wallet routes only (/bridge, /history). Marketing pages never load this module,
+// so Reown AppKit, wagmi, viem and the Solana adapters stay out of their bundles.
+export function WalletProviders({ children }: { children: ReactNode }) {
   return (
     <WagmiProvider config={wagmiAdapter.wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          <I18nProvider initialLanguage={initialLanguage}>
-            {children}
-            <Toaster />
-          </I18nProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </WagmiProvider>
   );
 }

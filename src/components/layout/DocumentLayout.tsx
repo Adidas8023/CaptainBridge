@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Figtree, Press_Start_2P, Silkscreen } from 'next/font/google';
 import Script from 'next/script';
-import { AppProviders } from '@/components/providers/AppProviders';
+import { SiteProviders } from '@/components/providers/SiteProviders';
 import type { Language } from '@/lib/i18n';
 import '@/app/globals.css';
 
@@ -53,21 +53,9 @@ export function DocumentLayout({
   return (
     <html lang={language === 'zh' ? 'zh-CN' : 'en'} suppressHydrationWarning>
       <body className={`${figtree.variable} ${pressStart.variable} ${silkscreen.variable} font-sans antialiased`}>
-        {/* Microsoft Clarity Analytics */}
-        <Script
-          id="clarity-script"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function(c,l,a,r,i,t,y){
-                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-              })(window, document, "clarity", "script", "y4odeb3uaw");
-            `,
-          }}
-        />
-        <AppProviders initialLanguage={language}>{children}</AppProviders>
+        {/* Shared AbelAI GA4 tracker; the same file ships on every abelai.app site. */}
+        <Script id="abel-ga4" src="/abel-analytics.js" strategy="afterInteractive" />
+        <SiteProviders initialLanguage={language}>{children}</SiteProviders>
       </body>
     </html>
   );
