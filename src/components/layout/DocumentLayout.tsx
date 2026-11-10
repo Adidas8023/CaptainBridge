@@ -4,6 +4,7 @@ import Script from 'next/script';
 import { SiteProviders } from '@/components/providers/SiteProviders';
 import type { Language } from '@/lib/i18n';
 import '@/app/globals.css';
+import { ogImage } from '@/lib/seo';
 
 const figtree = Figtree({
   variable: '--font-figtree',
@@ -35,11 +36,13 @@ export const metadata: Metadata = {
     description: 'Bridge USDC across chains instantly with Circle CCTP V2. Zero extra fees.',
     url: 'https://bridge.abelai.app',
     type: 'website',
+    images: [ogImage],
   },
   twitter: {
     card: 'summary_large_image',
     title: "Captain's Bridge | Cross-Chain USDC Transfer",
     description: 'Bridge USDC across chains instantly with Circle CCTP V2. Zero extra fees.',
+    images: [ogImage.url],
   },
 };
 

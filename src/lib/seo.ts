@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import type { Language } from '@/lib/i18n';
 
+// Static social preview rendered by app/og/route.tsx (prerendered at build).
+export const ogImage = { url: '/og', width: 1200, height: 630, alt: "Captain's Bridge: cross-chain USDC transfers" };
+
 export function landingMetadata(language: Language): Metadata {
   const title = language === 'zh' ? "Captain's Bridge｜USDC 跨链转账" : "Captain's Bridge | Cross-Chain USDC Transfer";
   const description = language === 'zh'
@@ -13,7 +16,7 @@ export function landingMetadata(language: Language): Metadata {
     title,
     description,
     alternates: { canonical, languages: { en: '/', 'zh-CN': '/zh', 'x-default': '/' } },
-    openGraph: { title, description, url: canonical, type: 'website', locale: language === 'zh' ? 'zh_CN' : 'en_US', alternateLocale: language === 'zh' ? 'en_US' : 'zh_CN' },
-    twitter: { card: 'summary_large_image', title, description },
+    openGraph: { title, description, url: canonical, type: 'website', images: [ogImage], locale: language === 'zh' ? 'zh_CN' : 'en_US', alternateLocale: language === 'zh' ? 'en_US' : 'zh_CN' },
+    twitter: { card: 'summary_large_image', title, description, images: [ogImage.url] },
   };
 }
