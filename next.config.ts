@@ -42,6 +42,12 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // workers.dev version-preview URLs serve the same pages; keep them out of search.
+        source: '/:path*',
+        has: [{ type: 'host' as const, value: '(?<host>.+)\\.workers\\.dev' }],
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex' }],
+      },
+      {
         source: "/:path*",
         headers: [
           { key: "Content-Security-Policy", value: contentSecurityPolicy },
