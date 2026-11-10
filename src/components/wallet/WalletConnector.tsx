@@ -6,6 +6,7 @@ import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useIsClient } from '@/lib/hooks/useIsClient';
+import { track } from '@/lib/analytics';
 
 /**
  * 钱包连接器组件
@@ -33,6 +34,7 @@ export function WalletConnector() {
       open({ view: 'Account', namespace: 'eip155' });
     } else {
       // 未连接：打开 EVM 连接视图
+      track('wallet_connect_click', { method: 'evm' });
       open({ view: 'Connect', namespace: 'eip155' });
     }
   }, [open, isEvmConnected]);
@@ -44,6 +46,7 @@ export function WalletConnector() {
       open({ view: 'Account', namespace: 'solana' });
     } else {
       // 未连接：打开 Solana 连接视图
+      track('wallet_connect_click', { method: 'solana' });
       open({ view: 'Connect', namespace: 'solana' });
     }
   }, [open, isSolanaConnected]);

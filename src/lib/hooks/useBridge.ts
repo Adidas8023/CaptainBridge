@@ -21,6 +21,7 @@ import {
 import { createSolanaConnection, withSolanaRpcFallback } from '@/config/wallet';
 import { createEvmPublicClient } from '@/config/rpc';
 import { logger } from '@/lib/logger';
+import { track } from '@/lib/analytics';
 import {
   createBridgeKit,
   createEvmBridgeAdapter,
@@ -323,6 +324,7 @@ export function useBridge(): UseBridgeReturn {
         addTransaction(transaction);
         setCurrentTx(transaction);
         setStep('completed');
+        track('bridge_complete', { result: 'success' });
 
         toast.success(t.toast.bridgeComplete, {
           description: `${t.toast.usdcReceived} ${destChain.name}`,
@@ -360,6 +362,7 @@ export function useBridge(): UseBridgeReturn {
       }
 
       setStep('error');
+      track('bridge_error', { result: 'error' });
       const bridgeMessage = getBridgeFailureMessage(err);
       setError(formatUserFriendlyError(bridgeMessage ?? err));
     }
@@ -419,6 +422,7 @@ export function useBridge(): UseBridgeReturn {
       }
     }
 
+    track('bridge_start', { feature: 'transfer' });
     await executeBridgeKit();
   }, [
     sourceChain,
@@ -494,8 +498,11 @@ export function useBridge(): UseBridgeReturn {
 
         toast.success(t.toast.claimSuccess);
         setStep('completed');
+
+        track('claim_complete', { result: 'success' });
       } catch (err) {
         logger.warn('Claim error:', err);
+        track('claim_error', { result: 'error' });
         updateTransaction(txId, { status: 'ready', updatedAt: Date.now() });
         setError(formatUserFriendlyError(err));
         setStep('error');
@@ -621,8 +628,11 @@ export function useBridge(): UseBridgeReturn {
 
         toast.success(t.toast.claimSuccessSolana);
         setStep('completed');
+
+        track('claim_complete', { result: 'success' });
       } catch (err) {
         logger.warn('Solana claim error:', err);
+        track('claim_error', { result: 'error' });
         updateTransaction(txId, { status: 'ready', updatedAt: Date.now() });
         setError(formatUserFriendlyError(err));
         setStep('error');
@@ -700,9 +710,12 @@ export function useBridge(): UseBridgeReturn {
 
           toast.success(t.toast.claimSuccess);
           setStep('completed');
+
+          track('claim_complete', { result: 'success' });
           return claimHash;
         } catch (err) {
           logger.warn('Manual claim error:', err);
+          track('claim_error', { result: 'error' });
           setError(formatUserFriendlyError(err));
           setStep('error');
           return null;
@@ -811,9 +824,12 @@ export function useBridge(): UseBridgeReturn {
 
           toast.success(t.toast.claimSuccessSolana);
           setStep('completed');
+
+          track('claim_complete', { result: 'success' });
           return signature as Hash;
         } catch (err) {
           logger.warn('Manual Solana claim error:', err);
+          track('claim_error', { result: 'error' });
           setError(formatUserFriendlyError(err));
           setStep('error');
           return null;

@@ -32,15 +32,20 @@ const projects = [
     href: { zh: 'https://ucard.abelai.app', en: 'https://ucard.abelai.app/en' },
     logo: 'https://abelai.app/images/products/ucard-home.webp',
   },
+  {
+    id: 'capymark',
+    name: { zh: 'CapyMark', en: 'CapyMark' },
+    description: { zh: '用 AI 管理的书签库', en: 'Bookmarks, managed by AI' },
+    href: { zh: 'https://capymark.abelai.app/', en: 'https://capymark.abelai.app/' },
+    logo: 'https://capymark.abelai.app/brand/capymark-180.png',
+  },
 ] as const;
 
+// No UTM tags: all projects share the abelai.app GA4 property and cookie, so
+// internal UTMs would overwrite the visitor's real acquisition source. The shared
+// tracker already records these clicks as project_click (target_site, placement).
 function projectUrl(project: (typeof projects)[number], language: Language) {
-  const url = new URL(project.href[language]);
-  url.searchParams.set('utm_source', 'bridge.abelai.app');
-  url.searchParams.set('utm_medium', 'navigation');
-  url.searchParams.set('utm_campaign', 'product-ecosystem');
-  url.searchParams.set('utm_content', project.id);
-  return url.toString();
+  return project.href[language];
 }
 
 export function EcosystemMenu({ language, mobile = false, onNavigate }: EcosystemMenuProps) {
