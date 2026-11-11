@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useAccount, useSwitchChain, useConfig } from 'wagmi';
 import { getWalletClient } from '@wagmi/core';
 import { type Hash, type EIP1193Provider } from 'viem';
@@ -154,6 +154,20 @@ export function useBridge(): UseBridgeReturn {
   const { addTransaction, updateTransaction, getTransactionById } = useHistoryStore();
 
   const isLoading = step !== 'idle' && step !== 'completed' && step !== 'error';
+
+  // A transfer is only written to history when the SDK settles. Leaving the page
+  // while it runs (closing the tab, reloading, or following a link to the
+  // landing pages, which use a different root layout and load as a full page)
+  // would drop the in-flight transfer and its transaction hash, so ask first.
+  useEffect(() => {
+    if (!isLoading) return;
+    const warn = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [isLoading]);
 
   /**
    * Ensure wallet is connected to the correct chain
