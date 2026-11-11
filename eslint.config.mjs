@@ -15,6 +15,8 @@ const eslintConfig = defineConfig([
     ".wrangler/**",
     "cloudflare-env.d.ts",
     "next-env.d.ts",
+    // Shared, pre-built GA4 tracker copied verbatim across the abelai.app sites.
+    "public/abel-analytics.js",
   ]),
 ]);
 

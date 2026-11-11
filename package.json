@@ -13,13 +13,13 @@
     "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "preinstall": "node scripts/check-node-version.mjs",
     "prebuild": "node scripts/check-node-version.mjs",
-    "test:dependencies": "node --test tests/dependency-compatibility.test.mjs"
+    "test:dependencies": "node --test tests/dependency-compatibility.test.mjs",
+    "check:seo": "node scripts/check-seo.mjs"
   },
   "dependencies": {
     "@circle-fin/adapter-solana": "1.7.6",
     "@circle-fin/adapter-viem-v2": "1.19.2",
     "@circle-fin/bridge-kit": "1.16.0",
-    "@opennextjs/cloudflare": "1.20.13",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-popover": "^1.1.15",
     "@radix-ui/react-slot": "^1.2.4",
@@ -49,6 +49,7 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "1.20.13",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -74,9 +75,9 @@
     "brace-expansion@>=5 <6": "5.0.12",
     "js-yaml@>=4 <5": "4.3.2",
     "proxy-addr": "2.0.8",
-    "undici@>=7 <8": "7.29.1",
-    "axios": "1.20.0",
-    "follow-redirects": "1.16.1",
+    "undici@>=7 <8": "7.30.2",
+    "axios": "1.21.1",
+    "follow-redirects": "1.16.3",
     "form-data": "4.0.6",
     "ws@>=8 <9": "8.22.0",
     "@solana/web3.js": {
@@ -86,7 +87,7 @@
       "uuid": "11.1.1"
     },
     "@coral-xyz/anchor": {
-      "toml": "4.2.0"
+      "toml": "5.0.1"
     },
     "glob@>=10 <11": "10.5.0",
     "@humanfs/node@>=0.16 <0.17": "0.16.8",

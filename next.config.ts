@@ -6,10 +6,12 @@ const contentSecurityPolicy = [
   "form-action 'self'",
   "frame-ancestors 'none'",
   "object-src 'none'",
-  "script-src 'self' 'unsafe-inline' https://*.clarity.ms https://c.bing.com",
+  // GA4 via the shared /abel-analytics.js (Google's documented GA4 hosts).
+  "script-src 'self' 'unsafe-inline' https://*.googletagmanager.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
-  "font-src 'self' data:",
+  // Reown AppKit's wallet modal loads its typeface from fonts.reown.com.
+  "font-src 'self' data: https://fonts.reown.com",
   "connect-src 'self' https: wss:",
   "frame-src https:",
   "media-src 'self' blob: https:",
@@ -19,6 +21,11 @@ const contentSecurityPolicy = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  experimental: {
+    // Each route group has its own root layout (wallet code only on /bridge and
+    // /history), so the 404 page needs to be self-contained.
+    globalNotFound: true,
+  },
   // Local logos are pre-sized during development. Serving them directly lets
   // Cloudflare cache immutable assets without invoking an image Worker.
   images: {
@@ -34,6 +41,12 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      {
+        // workers.dev version-preview URLs serve the same pages; keep them out of search.
+        source: '/:path*',
+        has: [{ type: 'host' as const, value: '(?<host>.+)\\.workers\\.dev' }],
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex' }],
+      },
       {
         source: "/:path*",
         headers: [

@@ -3,6 +3,7 @@
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import { Header } from '@/components/layout/Header';
+import { WalletConnector } from '@/components/wallet/WalletConnector';
 import { BlackholeBackground } from '@/components/layout/BlackholeBackground';
 import { BridgeCard } from '@/components/bridge/BridgeCard';
 import { useTranslation } from '@/lib/i18n';
@@ -20,7 +21,7 @@ export default function BridgePage() {
       <BlackholeBackground />
 
       {/* Header */}
-      <Header />
+      <Header wallet={<WalletConnector />} />
 
       {/* Main Content */}
       <div className="container mx-auto px-4 min-h-screen flex flex-col items-center justify-center relative z-10 py-20">

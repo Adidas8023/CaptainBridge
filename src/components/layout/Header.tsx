@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -10,12 +10,18 @@ import { LanguageToggle } from './LanguageToggle';
 import { useTranslation } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { EcosystemMenu } from './EcosystemMenu';
-import { WalletConnector } from '@/components/wallet/WalletConnector';
 
-export function Header() {
+// `wallet` is the wallet connector, passed in by the wallet routes only. Marketing
+// pages render a "Start bridging" link instead, so they never import wagmi/AppKit.
+export function Header({ wallet }: { wallet?: ReactNode }) {
   const pathname = usePathname();
   const { t, language } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const walletSlot = wallet ?? (
+    <Button asChild size="sm" className="h-8 sm:h-9 px-3">
+      <Link href={`/bridge?lang=${language}`} prefetch={false}>{t.home.startBridging}</Link>
+    </Button>
+  );
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-14 sm:h-16 px-3 sm:px-4 flex items-center justify-between bg-background/80 backdrop-blur-sm border-b border-border/50">
@@ -68,14 +74,14 @@ export function Header() {
       <div className="flex items-center gap-2 sm:gap-3">
         {/* 桌面端工具栏 */}
         <div className="hidden sm:flex items-center gap-2">
-          <WalletConnector />
+          {walletSlot}
           <LanguageToggle />
           <ThemeToggle />
         </div>
         
         {/* 移动端：只显示钱包和菜单按钮 */}
         <div className="flex sm:hidden items-center gap-1.5">
-          <WalletConnector />
+          {walletSlot}
           <Button
             variant="ghost"
             size="icon"

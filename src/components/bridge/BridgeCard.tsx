@@ -22,6 +22,7 @@ import { toast } from 'sonner';
 import { showTxError } from '@/lib/toast-utils';
 import { useTranslation } from '@/lib/i18n';
 import { logger } from '@/lib/logger';
+import { track } from '@/lib/analytics';
 
 export function BridgeCard() {
   const { open } = useAppKit();
@@ -197,6 +198,7 @@ export function BridgeCard() {
   const handleConnect = () => {
     // ✅ Solana: 打开 AppKit 弹窗，显式指定 namespace
     if (sourceChain?.type === 'solana') {
+      track('wallet_connect_click', { method: 'solana' });
       logger.info('[Bridge] Opening Solana connect');
       open({ view: 'Connect', namespace: 'solana' });
       return;
@@ -209,6 +211,7 @@ export function BridgeCard() {
         logger.info('[Bridge] EVM connected, switching to', sourceChain.name);
         void switchNetwork(sourceChain);
       } else {
+        track('wallet_connect_click', { method: 'evm' });
         logger.info('[Bridge] Opening EVM connect');
         open({ view: 'Connect', namespace: 'eip155' });
       }
