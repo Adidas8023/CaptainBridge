@@ -42,6 +42,9 @@ export function I18nProvider({ children, initialLanguage = 'en' }: { children: R
     setLanguageState(lang);
     if (typeof window !== 'undefined') {
       try { localStorage.setItem(STORAGE_KEY, lang); } catch { /* Storage can be disabled. */ }
+      // Mirror the choice in a cookie so the server renders /bridge and /history
+      // in this language on the next visit (see middleware.ts).
+      document.cookie = `${STORAGE_KEY}=${lang}; path=/; max-age=31536000; samesite=lax`;
     }
   }, []);
 
