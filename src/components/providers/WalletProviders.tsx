@@ -293,6 +293,35 @@ const xlayer = defineChain({
   },
 });
 
+// Arc pays gas in USDC (native, 18 decimals); Plasma pays gas in XPL.
+const arc = defineChain({
+  id: 5042,
+  caipNetworkId: 'eip155:5042',
+  chainNamespace: 'eip155',
+  name: 'Arc',
+  nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 },
+  rpcUrls: {
+    default: { http: getEvmRpcUrls(5042) },
+  },
+  blockExplorers: {
+    default: { name: 'Arc Explorer', url: 'https://explorer.arc.io' },
+  },
+});
+
+const plasma = defineChain({
+  id: 9745,
+  caipNetworkId: 'eip155:9745',
+  chainNamespace: 'eip155',
+  name: 'Plasma',
+  nativeCurrency: { name: 'Plasma', symbol: 'XPL', decimals: 18 },
+  rpcUrls: {
+    default: { http: getEvmRpcUrls(9745) },
+  },
+  blockExplorers: {
+    default: { name: 'Plasmascan', url: 'https://plasmascan.to' },
+  },
+});
+
 // 所有 EVM 网络
 const evmNetworks = [
   ethereum,
@@ -318,6 +347,8 @@ const evmNetworks = [
   morph,
   pharos,
   xlayer,
+  arc,
+  plasma,
 ];
 
 // Wagmi Adapter - EVM链配置
@@ -351,6 +382,8 @@ function initializeAppKit() {
       projectId,
       chainImages: {
         196: '/logos/x-layer.svg',
+        5042: '/logos/arc.svg',
+        9745: '/logos/plasma.svg',
       },
       enableCoinbase: false,
       metadata: {

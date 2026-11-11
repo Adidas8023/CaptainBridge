@@ -40,7 +40,9 @@ type BridgeKitChain =
   | 'Morph'
   | 'Pharos'
   | 'Cronos'
-  | 'X_Layer';
+  | 'X_Layer'
+  | 'Arc'
+  | 'Plasma';
 
 type TransferSpeed = 'FAST' | 'SLOW';
 
@@ -89,6 +91,8 @@ const BRIDGE_CHAIN_BY_DOMAIN: Record<number, BridgeKitChain> = {
   31: 'Pharos',
   32: 'Cronos',
   37: 'X_Layer',
+  26: 'Arc',
+  33: 'Plasma',
 };
 
 // Circle CCTP v2 fast-transfer source support. Starknet intentionally omitted.
