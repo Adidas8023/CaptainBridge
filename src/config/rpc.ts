@@ -61,6 +61,14 @@ export const EVM_RPC_CONFIG: Record<number, EvmRpcConfig> = {
     envKey: 'NEXT_PUBLIC_XLAYER_RPC_URL',
     defaultUrl: 'https://xlayerrpc.okx.com',
   },
+  5042: {
+    envKey: 'NEXT_PUBLIC_ARC_RPC_URL',
+    defaultUrl: 'https://rpc.mainnet.arc.io',
+  },
+  9745: {
+    envKey: 'NEXT_PUBLIC_PLASMA_RPC_URL',
+    defaultUrl: 'https://rpc.plasma.to',
+  },
   480: {
     envKey: 'NEXT_PUBLIC_WORLDCHAIN_RPC_URL',
     defaultUrl: 'https://worldchain-mainnet.g.alchemy.com/public',
@@ -152,6 +160,8 @@ export const RPC_DEFAULTS = {
   morph: getDefaultEvmRpcUrl(2818),
   pharos: getDefaultEvmRpcUrl(1672),
   xlayer: getDefaultEvmRpcUrl(196),
+  arc: getDefaultEvmRpcUrl(5042),
+  plasma: getDefaultEvmRpcUrl(9745),
 };
 
 export function getEvmRpcUrls(chainId: number, primaryRpcUrl?: string): string[] {

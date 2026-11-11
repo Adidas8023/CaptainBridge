@@ -17,9 +17,9 @@
     "check:seo": "node scripts/check-seo.mjs"
   },
   "dependencies": {
-    "@circle-fin/adapter-solana": "1.7.6",
-    "@circle-fin/adapter-viem-v2": "1.19.2",
-    "@circle-fin/bridge-kit": "1.16.0",
+    "@circle-fin/adapter-solana": "1.8.1",
+    "@circle-fin/adapter-viem-v2": "1.20.1",
+    "@circle-fin/bridge-kit": "1.17.1",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-popover": "^1.1.15",
     "@radix-ui/react-slot": "^1.2.4",

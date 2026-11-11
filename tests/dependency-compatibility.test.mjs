@@ -92,7 +92,7 @@ test('upgraded Circle SDK preserves every configured mainnet USDC route and cont
   const { createBridgeKit, toBridgeKitChain } = loadSource('lib/cctp/bridge-kit');
   const kit = await createBridgeKit();
   const catalog = kit.getSupportedChains({ isTestnet: false });
-  assert.equal(CHAINS.length, 24);
+  assert.equal(CHAINS.length, 26);
   assert.equal(new Set(CHAINS.map(chain => chain.domainId)).size, CHAINS.length);
   for (const chain of CHAINS) {
     const sdk = catalog.find(entry => entry.chain === toBridgeKitChain(chain));
@@ -107,5 +107,5 @@ test('upgraded Circle SDK preserves every configured mainnet USDC route and cont
   }
   assert.equal(CHAINS.some(chain => chain.domainId === 25), false, 'Starknet stays excluded');
   const configuredDomains = new Set(CHAINS.map(chain => chain.domainId));
-  assert.deepEqual(catalog.filter(chain => !configuredDomains.has(chain.cctp.domain)).map(chain => chain.chain).sort(), ['Arc', 'Plasma']);
+  assert.deepEqual(catalog.filter(chain => !configuredDomains.has(chain.cctp.domain)).map(chain => chain.chain).sort(), [], 'every Bridge Kit mainnet chain is configured');
 });
