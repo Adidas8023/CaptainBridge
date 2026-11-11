@@ -13,7 +13,8 @@
     "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "preinstall": "node scripts/check-node-version.mjs",
     "prebuild": "node scripts/check-node-version.mjs",
-    "test:dependencies": "node --test tests/dependency-compatibility.test.mjs"
+    "test:dependencies": "node --test tests/dependency-compatibility.test.mjs",
+    "check:seo": "node scripts/check-seo.mjs"
   },
   "dependencies": {
     "@circle-fin/adapter-solana": "1.7.6",
