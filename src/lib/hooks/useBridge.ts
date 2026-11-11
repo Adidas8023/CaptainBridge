@@ -549,6 +549,7 @@ export function useBridge(): UseBridgeReturn {
           }
           updateTransaction(txId, { status: 'ready', updatedAt: Date.now() });
           setStep('error');
+          track('claim_error', { result: 'error' });
           return;
         }
 
@@ -754,6 +755,7 @@ export function useBridge(): UseBridgeReturn {
               );
             }
             setStep('error');
+            track('claim_error', { result: 'error' });
             return null;
           }
 
@@ -802,6 +804,7 @@ export function useBridge(): UseBridgeReturn {
                 duration: 10000,
               });
               setStep('error');
+              track('claim_error', { result: 'error' });
               return null;
             }
             throw new Error(`模拟失败: ${errStr}`);
