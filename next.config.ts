@@ -6,11 +6,11 @@ const contentSecurityPolicy = [
   "form-action 'self'",
   "frame-ancestors 'none'",
   "object-src 'none'",
-  "script-src 'self' 'unsafe-inline' https://*.clarity.ms https://c.bing.com",
+  "script-src 'self' https://www.googletagmanager.com 'unsafe-inline'",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https:",
+  "img-src 'self' https://www.google-analytics.com data: blob: https:",
   "font-src 'self' data:",
-  "connect-src 'self' https: wss:",
+  "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https: wss:",
   "frame-src https:",
   "media-src 'self' blob: https:",
   "worker-src 'self' blob:",
@@ -23,6 +23,14 @@ const nextConfig: NextConfig = {
   // Cloudflare cache immutable assets without invoking an image Worker.
   images: {
     unoptimized: true,
+  },
+  async redirects() {
+    return ['en', 'zh'].map((language) => ({
+      source: '/',
+      has: [{ type: 'query' as const, key: 'lang', value: language }],
+      destination: `/${language}`,
+      permanent: false,
+    }));
   },
   async headers() {
     return [

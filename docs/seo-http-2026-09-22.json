@@ -1,0 +1,42 @@
+{
+  "base": "http://localhost:8807",
+  "checks": "passed",
+  "pages": [
+    {
+      "path": "/",
+      "status": 200,
+      "title": "Captain&#x27;s Bridge | Cross-Chain USDC Transfer",
+      "canonical": "https://bridge.abelai.app",
+      "scriptCount": 32,
+      "jsBytes": 3203176,
+      "gzipBytes": 919221
+    },
+    {
+      "path": "/en",
+      "status": 200,
+      "title": "Captain&#x27;s Bridge | Cross-Chain USDC Transfer",
+      "canonical": "https://bridge.abelai.app/en"
+    },
+    {
+      "path": "/zh",
+      "status": 200,
+      "title": "Captain&#x27;s Bridge｜USDC 跨链转账",
+      "canonical": "https://bridge.abelai.app/zh"
+    },
+    {
+      "path": "/bridge",
+      "status": 200,
+      "title": "Bridge USDC with Circle CCTP V2 | Captain&#x27;s Bridge",
+      "canonical": "https://bridge.abelai.app/bridge",
+      "scriptCount": 33,
+      "jsBytes": 3228761,
+      "gzipBytes": 930496
+    },
+    {
+      "path": "/history",
+      "status": 200,
+      "title": "Your Transfer History | Captain&#x27;s Bridge",
+      "canonical": "https://bridge.abelai.app/history"
+    }
+  ]
+}

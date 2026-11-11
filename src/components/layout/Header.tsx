@@ -7,10 +7,10 @@ import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { LanguageToggle } from './LanguageToggle';
-import { WalletConnector } from '@/components/wallet/WalletConnector';
 import { useTranslation } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { EcosystemMenu } from './EcosystemMenu';
+import { WalletConnector } from '@/components/wallet/WalletConnector';
 
 export function Header() {
   const pathname = usePathname();
@@ -22,7 +22,7 @@ export function Header() {
       {/* 左侧：品牌 Logo + 导航 */}
       <div className="flex items-center gap-4 sm:gap-8">
         {/* 品牌 Logo + 名称 */}
-        <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group">
+        <Link href={`/${language}`} className="flex items-center gap-2 sm:gap-2.5 group">
           <Image
             src="/logos/abel-avatar.jpg" 
             alt="Captain's Bridge" 
@@ -51,13 +51,13 @@ export function Header() {
 
         {/* 桌面端导航链接 */}
         <nav className="hidden md:flex items-center gap-1">
-          <NavLink href="/" active={pathname === '/'}>
+          <NavLink href={`/${language}`} active={pathname === '/' || pathname === '/en' || pathname === '/zh'}>
             {t.header.home}
           </NavLink>
-          <NavLink href="/bridge" active={pathname === '/bridge'}>
+          <NavLink href={`/bridge?lang=${language}`} active={pathname === '/bridge'}>
             {t.header.bridge}
           </NavLink>
-          <NavLink href="/history" active={pathname === '/history'}>
+          <NavLink href={`/history?lang=${language}`} active={pathname === '/history'}>
             {t.header.history}
           </NavLink>
           <EcosystemMenu language={language} />
@@ -101,21 +101,21 @@ export function Header() {
         <div id="mobile-navigation" className="absolute top-14 left-0 right-0 bg-background/95 backdrop-blur-md border-b border-border/50 p-4 sm:hidden animate-in slide-in-from-top-2 duration-200">
           <nav className="flex flex-col gap-2 mb-4">
             <MobileNavLink 
-              href="/" 
-              active={pathname === '/'} 
+              href={`/${language}`}
+              active={pathname === '/' || pathname === '/en' || pathname === '/zh'}
               onClick={() => setMobileMenuOpen(false)}
             >
               {t.header.home}
             </MobileNavLink>
             <MobileNavLink 
-              href="/bridge" 
+              href={`/bridge?lang=${language}`}
               active={pathname === '/bridge'} 
               onClick={() => setMobileMenuOpen(false)}
             >
               {t.header.bridge}
             </MobileNavLink>
             <MobileNavLink 
-              href="/history" 
+              href={`/history?lang=${language}`}
               active={pathname === '/history'} 
               onClick={() => setMobileMenuOpen(false)}
             >
@@ -137,6 +137,7 @@ function NavLink({ href, active, children }: { href: string; active: boolean; ch
   return (
     <Link
       href={href}
+      prefetch={false}
       className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
         active
           ? 'bg-primary/10 text-primary'
@@ -162,6 +163,7 @@ function MobileNavLink({
   return (
     <Link
       href={href}
+      prefetch={false}
       onClick={onClick}
       className={`px-4 py-3 text-base font-medium rounded-lg transition-colors ${
         active

@@ -23,7 +23,7 @@ import { ThemeProvider } from 'next-themes';
 import { Toaster } from '@/components/ui/sonner';
 import { solanaConfig } from '@/config/wallet';
 import { getEvmRpcUrls } from '@/config/rpc';
-import { I18nProvider } from '@/lib/i18n';
+import { I18nProvider, type Language } from '@/lib/i18n';
 import { logger } from '@/lib/logger';
 
 // 保存原始 fetch 函数，防止浏览器扩展（如 Ambire）拦截导致 resource.clone 错误
@@ -342,6 +342,7 @@ const solanaMainnet = {
 
 interface AppProvidersProps {
   children: ReactNode;
+  initialLanguage: Language;
 }
 
 function initializeAppKit() {
@@ -382,7 +383,7 @@ function initializeAppKit() {
 // must happen before any descendant calls useAppKit.
 initializeAppKit();
 
-export function AppProviders({ children }: AppProvidersProps) {
+export function AppProviders({ children, initialLanguage }: AppProvidersProps) {
   return (
     <WagmiProvider config={wagmiAdapter.wagmiConfig}>
       <QueryClientProvider client={queryClient}>
@@ -392,7 +393,7 @@ export function AppProviders({ children }: AppProvidersProps) {
           enableSystem={false}
           disableTransitionOnChange
         >
-          <I18nProvider>
+          <I18nProvider initialLanguage={initialLanguage}>
             {children}
             <Toaster />
           </I18nProvider>

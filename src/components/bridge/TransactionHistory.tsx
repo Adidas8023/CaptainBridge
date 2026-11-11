@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef, useSyncExternalStore } from 'react';
 import { ArrowLeftRight, Check, Clock, ExternalLink, History, Loader2, RefreshCw } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useHistoryStore } from '@/store/history-store';
 import { useBridge } from '@/lib/hooks/useBridge';
@@ -206,12 +207,12 @@ export function TransactionHistory() {
         </p>
         
         {/* CTA */}
-        <a 
+        <Link
           href="/bridge" 
           className="mt-6 px-5 py-2.5 bg-primary/10 hover:bg-primary/20 text-primary text-sm font-medium rounded-full transition-colors border border-primary/20 hover:border-primary/40"
         >
           {t.history.startBridging || 'Start Bridging'}
-        </a>
+        </Link>
       </div>
     );
   }

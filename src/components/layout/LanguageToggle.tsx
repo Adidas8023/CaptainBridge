@@ -12,6 +12,11 @@ export function LanguageToggle() {
 
   const toggleLanguage = () => {
     const nextLanguage = language === 'en' ? 'zh' : 'en';
+    if (pathname === '/' || pathname === '/en' || pathname === '/zh') {
+      setLanguage(nextLanguage);
+      router.push(`/${nextLanguage}`);
+      return;
+    }
     const nextSearchParams = new URLSearchParams(window.location.search);
     nextSearchParams.set('lang', nextLanguage);
     setLanguage(nextLanguage);

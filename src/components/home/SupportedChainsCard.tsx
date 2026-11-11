@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Layers, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import { useTranslation } from "@/lib/i18n";
-import { CHAINS } from "@/lib/cctp/constants";
+import type { DisplayChain } from "./types";
 
 // 颜色映射 - 根据链的主色生成渐变
 const getGradientColor = (color: string): string => {
@@ -33,13 +33,12 @@ const getGradientColor = (color: string): string => {
   return colorMap[color] || 'from-gray-400 to-gray-600';
 };
 
-const supportedChains = CHAINS.map((chain) => ({
-  name: chain.name,
-  color: getGradientColor(chain.color),
-  logo: chain.icon,
-}));
-
-const SupportedChainsCard: React.FC = () => {
+const SupportedChainsCard: React.FC<{ chains: DisplayChain[] }> = ({ chains }) => {
+  const supportedChains = chains.map((chain) => ({
+    name: chain.name,
+    color: getGradientColor(chain.color),
+    logo: chain.icon,
+  }));
   const { language } = useTranslation();
 
   return (

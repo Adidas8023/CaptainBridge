@@ -10,7 +10,9 @@
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "cf:build": "opennextjs-cloudflare build",
-    "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
+    "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
+    "preinstall": "node scripts/check-node-version.mjs",
+    "prebuild": "node scripts/check-node-version.mjs"
   },
   "dependencies": {
     "@circle-fin/adapter-solana": "^1.6.5",
@@ -61,5 +63,8 @@
     "@wagmi/connectors": "7.0.5",
     "@wagmi/core": "3.0.1",
     "postcss": "^8.5.10"
+  },
+  "engines": {
+    "node": "^22.23.4 || ^24.22.1 || ^26.12.1"
   }
 }

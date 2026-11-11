@@ -1,5 +1,6 @@
 'use client';
 
+import { track } from '@/lib/analytics';
 import { useState, useCallback } from 'react';
 import { useAccount, useSwitchChain, useConfig } from 'wagmi';
 import { getWalletClient } from '@wagmi/core';
@@ -225,6 +226,7 @@ export function useBridge(): UseBridgeReturn {
 
     setError(null);
     setCurrentTx(null);
+    track('bridge_start', { feature: 'transfer' });
     setStep('checking-allowance');
 
     try {
@@ -323,6 +325,7 @@ export function useBridge(): UseBridgeReturn {
         addTransaction(transaction);
         setCurrentTx(transaction);
         setStep('completed');
+        track('bridge_complete', { result: 'success' });
 
         toast.success(t.toast.bridgeComplete, {
           description: `${t.toast.usdcReceived} ${destChain.name}`,
@@ -360,6 +363,7 @@ export function useBridge(): UseBridgeReturn {
       }
 
       setStep('error');
+      track('bridge_error', { result: 'error' });
       const bridgeMessage = getBridgeFailureMessage(err);
       setError(formatUserFriendlyError(bridgeMessage ?? err));
     }
@@ -494,11 +498,13 @@ export function useBridge(): UseBridgeReturn {
 
         toast.success(t.toast.claimSuccess);
         setStep('completed');
+        track('claim_complete', { result: 'success' });
       } catch (err) {
         logger.warn('Claim error:', err);
         updateTransaction(txId, { status: 'ready', updatedAt: Date.now() });
         setError(formatUserFriendlyError(err));
         setStep('error');
+      track('claim_error', { result: 'error' });
       }
       return;
     }
@@ -542,6 +548,7 @@ export function useBridge(): UseBridgeReturn {
           }
           updateTransaction(txId, { status: 'ready', updatedAt: Date.now() });
           setStep('error');
+      track('claim_error', { result: 'error' });
           return;
         }
 
@@ -621,11 +628,13 @@ export function useBridge(): UseBridgeReturn {
 
         toast.success(t.toast.claimSuccessSolana);
         setStep('completed');
+        track('claim_complete', { result: 'success' });
       } catch (err) {
         logger.warn('Solana claim error:', err);
         updateTransaction(txId, { status: 'ready', updatedAt: Date.now() });
         setError(formatUserFriendlyError(err));
         setStep('error');
+      track('claim_error', { result: 'error' });
       }
       return;
     }
@@ -700,11 +709,13 @@ export function useBridge(): UseBridgeReturn {
 
           toast.success(t.toast.claimSuccess);
           setStep('completed');
+        track('claim_complete', { result: 'success' });
           return claimHash;
         } catch (err) {
           logger.warn('Manual claim error:', err);
           setError(formatUserFriendlyError(err));
           setStep('error');
+      track('claim_error', { result: 'error' });
           return null;
         }
       }
@@ -741,6 +752,7 @@ export function useBridge(): UseBridgeReturn {
               );
             }
             setStep('error');
+      track('claim_error', { result: 'error' });
             return null;
           }
 
@@ -789,6 +801,7 @@ export function useBridge(): UseBridgeReturn {
                 duration: 10000,
               });
               setStep('error');
+      track('claim_error', { result: 'error' });
               return null;
             }
             throw new Error(`模拟失败: ${errStr}`);
@@ -811,11 +824,13 @@ export function useBridge(): UseBridgeReturn {
 
           toast.success(t.toast.claimSuccessSolana);
           setStep('completed');
+        track('claim_complete', { result: 'success' });
           return signature as Hash;
         } catch (err) {
           logger.warn('Manual Solana claim error:', err);
           setError(formatUserFriendlyError(err));
           setStep('error');
+      track('claim_error', { result: 'error' });
           return null;
         }
       }

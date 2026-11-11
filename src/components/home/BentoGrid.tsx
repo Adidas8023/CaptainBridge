@@ -8,11 +8,14 @@ import ImpactStatsCard from "./ImpactStatsCard";
 import FixedFeeCard from "./FixedFeeCard";
 import HowItWorksCard from "./HowItWorksCard";
 
+import type { DisplayChain } from "./types";
+
 interface BentoGridProps {
+  chains: DisplayChain[];
   onStartTransfer: () => void;
 }
 
-const BentoGrid: React.FC<BentoGridProps> = ({ onStartTransfer }) => {
+const BentoGrid: React.FC<BentoGridProps> = ({ onStartTransfer, chains }) => {
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
@@ -57,7 +60,7 @@ const BentoGrid: React.FC<BentoGridProps> = ({ onStartTransfer }) => {
             className="md:col-span-3 lg:col-span-4 md:row-span-2 order-1"
             style={{ minHeight: '400px' }}
           >
-            <HeroCard onStartTransfer={onStartTransfer} />
+            <HeroCard onStartTransfer={onStartTransfer} chainCount={chains.length} />
           </motion.div>
 
           {/* Impact Stats Card - Top right */}
@@ -65,7 +68,7 @@ const BentoGrid: React.FC<BentoGridProps> = ({ onStartTransfer }) => {
             variants={itemVariants}
             className="md:col-span-1 lg:col-span-2 order-2"
           >
-            <ImpactStatsCard />
+            <ImpactStatsCard chainCount={chains.length} />
           </motion.div>
 
           {/* Security Card - Below stats */}
@@ -81,7 +84,7 @@ const BentoGrid: React.FC<BentoGridProps> = ({ onStartTransfer }) => {
             variants={itemVariants}
             className="md:col-span-2 lg:col-span-3 order-4"
           >
-            <SupportedChainsCard />
+            <SupportedChainsCard chains={chains} />
           </motion.div>
 
           {/* How It Works Card - Bottom right, spans remaining space */}

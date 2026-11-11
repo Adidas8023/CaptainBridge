@@ -36,10 +36,6 @@ const projects = [
 
 function projectUrl(project: (typeof projects)[number], language: Language) {
   const url = new URL(project.href[language]);
-  url.searchParams.set('utm_source', 'bridge.abelai.app');
-  url.searchParams.set('utm_medium', 'navigation');
-  url.searchParams.set('utm_campaign', 'product-ecosystem');
-  url.searchParams.set('utm_content', project.id);
   return url.toString();
 }
 
